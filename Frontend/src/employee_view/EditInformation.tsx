@@ -11,9 +11,10 @@ import FileUploadField from "../register/FileInput";
 
 const EditInformation: React.FC = () => {
   const { loaded, employee } = useEmployee();
-  //console.log(employee);
-  delete employee?.files;
-  //console.log(employee);
+
+  const {openSnackbar,snackBarMessage,snackbarSeverity,showSnackbar,handleCloseSnackbar} = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUpdated, setIsUpdated] = useState(false);
   
   const {
     register,
@@ -40,37 +41,26 @@ const EditInformation: React.FC = () => {
         user_type: employee?.user_credentials?.user_type || "",
       },
       profile_image:null,
+      id_card:null,
+      visa:null,
+      unilav:null
     }
   });
-
-  //console.log(watch());
-  console.log(watch("profile_image"));
-
-  const {openSnackbar,snackBarMessage,snackbarSeverity,showSnackbar,handleCloseSnackbar} = useSnackbar();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isUpdated, setIsUpdated] = useState(false);
-
   
   const contractStartDate = watch("contract_validity_start_date");
   const visaStartDate = watch("visa_start_date");
   const idEndDate = watch("id_card_end_date");
+  const hasDirtyFields = Object.keys(dirtyFields).length > 0;
+  const hasNewProfileImage = !!watch("profile_image");
+  const hasNewIdCard = !!watch("id_card");
+  const hasNewVisa  = !!watch("visa");
+  const hasNewUnilav  = !!watch("unilav");
+  const isButtonDisabled = !(hasDirtyFields || hasNewProfileImage || hasNewIdCard || hasNewVisa || hasNewUnilav);
 
   const onSubmit = handleSubmit(async (data: Employee) => {
-    console.log(data);
-  console.log(dirtyFields);
+  console.log(data);
   setIsLoading(true);
 
-  // Verifica si no hay campos modificados y si no se seleccionó una nueva imagen
-  const hasDirtyFields = Object.keys(dirtyFields).length > 0;
-  const hasNewProfileImage = !!data.profile_image; // Verifica si hay un archivo cargado
-
-  if (!hasDirtyFields && !hasNewProfileImage) {
-    showSnackbar("You haven't modified any field", "warning", true);
-    setIsLoading(false);
-    return;
-  }
-
-  // Si hay cambios, procesa los campos modificados y/o la nueva imagen
   const updatedFields = Object.keys(dirtyFields).reduce((acc, key) => {
     const field = key as keyof Employee;
     if (dirtyFields[field]) {
@@ -83,21 +73,57 @@ const EditInformation: React.FC = () => {
     updatedFields.profile_image = data.profile_image; // Incluye el archivo si se subió
   }
 
-  console.log("Updated fields:", updatedFields);
+  if (hasNewIdCard) {
+    updatedFields.id_card = data.id_card; // Incluye el archivo si se subió
+  }
 
-  /*   try { 
+  if (hasNewVisa) {
+    updatedFields.visa = data.visa; // Incluye el archivo si se subió
+  }
+  if (hasNewUnilav) {
+    updatedFields.unilav = data.unilav; // Incluye el archivo si se subió
+  }
+
+
+  // Crear FormData
+  const formData = new FormData();
+  for (const key in updatedFields) {
+  const value = updatedFields[key as keyof Employee];
+
+  // Verifica si es un archivo
+  if (key === "profile_image" && value instanceof File) {
+    formData.append(key, value);
+  } 
+  else if (key === "visa" && value instanceof File) {
+    formData.append(key, value);
+  }
+  else if (key === "unilav" && value instanceof File) {
+    formData.append(key, value);
+  }
+  else if (key === "id_card" && value instanceof File) {
+    formData.append(key, value);
+  }
+  else if (key === "user_credentials" && typeof value === "object") {
+    formData.append(key, JSON.stringify(value));
+  } else {
+    formData.append(key, String(value)); // Convertir valores no archivos a cadena
+    }
+  }
+
+    try { 
       const response = await axios.patch(
         `http://localhost:8000/update/${employee?.fiscal_code}`,
-        updatedFields,
+        formData,
         {
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form/data",
           },
         }
       );
       showSnackbar(response.data.message,"success",true);
       setIsLoading(false);
       setIsUpdated(true);
+      console.log(response)
       //reset();
     } catch (error) {
       showSnackbar(error?.response?.data?.detail || "Error updating data","error",true);
@@ -106,12 +132,11 @@ const EditInformation: React.FC = () => {
       //console.log(error)
     } finally {
       setTimeout(() => {
-       
         showSnackbar("","warning",false);
         setIsLoading(false);
         setIsUpdated(false);
       }, 1500);
-    } */
+    }
   });
 
   return !loaded ? (
@@ -325,7 +350,6 @@ const EditInformation: React.FC = () => {
                 name="profile_image"
                 label="User Image"
                 control={control}
-                rules={{ required: true }}
                 accept="image/png"
                 setValue={setValue}
                 watch={watch}
@@ -334,11 +358,10 @@ const EditInformation: React.FC = () => {
                 fileExtension="png"
               />
 
-              {/* <FileUploadField
+               <FileUploadField
                 name="id_card"
                 label="ID Card"
                 control={control}
-                rules={{ required: true }}
                 accept="image/png"
                 setValue={setValue}
                 watch={watch}
@@ -347,11 +370,11 @@ const EditInformation: React.FC = () => {
                 fileExtension="png"
               />
 
+               
               <FileUploadField
                 name="visa"
                 label="Visa"
                 control={control}
-                rules={{ required: true }}
                 accept="application/pdf"
                 setValue={setValue}
                 watch={watch}
@@ -364,17 +387,17 @@ const EditInformation: React.FC = () => {
                 name="unilav"
                 label="Unilav"
                 control={control}
-                rules={{ required: true }}
                 accept="application/pdf"
                 setValue={setValue}
                 watch={watch}
                 isEdit={true}
                 fiscalCode={employee?.fiscal_code} 
                 fileExtension="pdf"
-              />  */}
+              /> 
+              
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
               {!isLoading && !isUpdated && (
-                <Button type="submit" variant="contained" color="primary" sx={{ display: 'inline', marginTop: 2, marginBottom: 2 }} >
+                <Button type="submit" variant="contained" color="primary" sx={{ display: 'inline', marginTop: 2, marginBottom: 2 }} disabled={isButtonDisabled} >
                   Update
                 </Button>
               )}

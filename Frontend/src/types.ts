@@ -20,10 +20,13 @@ export interface Employee {
     user_credentials: UserCredentials;
     purchase_order:PurchaseOrder[];
     profile_image:File | null;
-    id_card:File; 
-    visa:File;
-    unilav:File;
-    files?:object;
+    id_card:File | null; 
+    visa:File | null;
+    unilav:File | null;
+    profile_image_path?:string;
+    id_card_path?:string;
+    visa_path?:string;
+    unilav_path?:string;
 }
 
 export interface Requester{

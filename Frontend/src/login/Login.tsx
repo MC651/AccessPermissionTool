@@ -27,7 +27,7 @@ const Login: React.FC = () => {
     );
       localStorage.setItem("access_token", response.data["access_token"]);
       localStorage.setItem("user_type", response.data["ut"]);
-      localStorage.setItem("user_name", response.data["us"]);
+      //localStorage.setItem("user_name", response.data["us"]);
       localStorage.setItem("fiscal_code", response.data["fs"]);
       showSnackbar(response.data.message || "Login Successful", "success",true);
       console.log(response);
