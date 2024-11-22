@@ -1,19 +1,22 @@
+import json
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Path, UploadFile,status, Response
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import EmailStr
-from models.models import Person,Token,FilteredEmployee,ModifiedEmployee,PurchaseOrder,AccessPermission
+from models.models import Person,Token,FilteredEmployee,ModifiedEmployee,PurchaseOrder,AccessPermission, UserCredentials
 from dal.employees_dal import EmployeesDAL
 from database import get_employees_dal
 from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
 import jwt
 from datetime import datetime,timedelta,timezone
 from jwt.exceptions import InvalidTokenError
-from typing import Annotated, Optional
+from typing import Annotated, Any, Dict, Optional
 import os
 from dotenv import load_dotenv
 load_dotenv()
+
 router = APIRouter()
+
 router.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 """ 
@@ -46,12 +49,10 @@ async def save_files(files: list[UploadFile], file_names: list[str], root_dir: s
     saved_file_paths = []
 
     for file, new_name in zip(files, file_names):
-        print(file,new_name)
         # Cambiar el nombre del archivo
         file_extension = os.path.splitext(file.filename)[1]  # Obtener la extensión del archivo original
-        print(file_extension)
+
         renamed_file = f"{new_name}{file_extension}"  # Combinar el nuevo nombre con la extensión
-        print(renamed_file)
 
         # Construir la ruta del archivo
         file_location = os.path.join(root_dir, renamed_file)
@@ -137,7 +138,7 @@ POST Methods
 async def login_for_access_token(response: Response,form_data: Annotated[OAuth2PasswordRequestForm, Depends()], 
                                  employees_dal: EmployeesDAL = Depends(get_employees_dal))-> Token:
     user = await employees_dal.email_password_verification(form_data.username,form_data.password)
-    print(user)
+
     #print(f"User from Login: {user}")
     if not user:
         raise HTTPException(
@@ -298,7 +299,7 @@ async def insert_access_permission(
     except HTTPException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
-@router.patch("/update/{fiscal_code}")
+""" @router.patch("/update/{fiscal_code}")
 async def update_employee(
     fiscal_code: str,
     employee_update: ModifiedEmployee,
@@ -317,7 +318,91 @@ async def update_employee(
         return {"message": f"Employee with fiscal code: {fiscal_code} updated successfully"}
     
     except HTTPException as e:
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
+        raise HTTPException(status_code=e.status_code, detail=e.detail) """
+
+@router.patch("/update/{fiscal_code}")
+async def update_employee(
+    fiscal_code: str,
+    first_name: Optional[str] = Form(None),
+    last_name: Optional[str] = Form(None),
+    birth_date: Optional[datetime] = Form(None),
+    contract_type: Optional[str] = Form(None),
+    contract_validity_start_date: Optional[datetime] = Form(None),
+    contract_validity_end_date: Optional[datetime] = Form(None),
+    id_card_end_date: Optional[datetime] = Form(None),
+    visa_start_date: Optional[datetime] = Form(None),
+    visa_end_date: Optional[datetime] = Form(None),
+    user_credentials: Optional[str] = Form(None),  # Se envía como JSON string
+    profile_image: Optional[UploadFile] = File(None),
+    id_card: Optional[UploadFile] = File(None),
+    visa: Optional[UploadFile] = File(None),
+    unilav: Optional[UploadFile] = File(None),
+    employees_dal: EmployeesDAL = Depends(get_employees_dal),
+):
+    try:
+        
+        existing_employee = await employees_dal.list_employees(fiscal_code)
+
+        # Construir los datos actualizados
+        update_data: Dict[str, Any] = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "birth_date": birth_date,
+            "contract_type": contract_type,
+            "contract_validity_start_date": contract_validity_start_date,
+            "contract_validity_end_date": contract_validity_end_date,
+            "id_card_end_date": id_card_end_date,
+            "visa_start_date": visa_start_date,
+            "visa_end_date": visa_end_date
+        }
+
+        # Procesar el campo user_credentials si se envía
+        if user_credentials:
+            try:
+                update_data["user_credentials"] = json.loads(user_credentials)
+            except json.JSONDecodeError:
+                raise HTTPException(
+                    status_code=400, detail="Invalid format for user_credentials"
+                )
+
+        if profile_image:
+            # Guardar el archivo o procesarlo según sea necesario
+            file_location = f"./uploads/{fiscal_code}/profile_image.png"
+            with open(file_location, "wb") as file:
+                file.write(await profile_image.read())
+            update_data["profile_image_path"] = file_location
+        
+        if id_card:
+            file_location = f"./uploads/{fiscal_code}/id_card.png"
+            with open(file_location, "wb") as file:
+                file.write(await id_card.read())
+            update_data["id_card_path"] = file_location
+
+        if visa:
+            file_location = f"./uploads/{fiscal_code}/visa.pdf"
+            with open(file_location, "wb") as file:
+                file.write(await visa.read())
+            update_data["visa_path"] = file_location
+        
+        if unilav:
+            file_location = f"./uploads/{fiscal_code}/unilav.pdf"
+            with open(file_location, "wb") as file:
+                file.write(await unilav.read())
+            update_data["unilav_path"] = file_location
+
+        # Excluir campos no enviados (None)
+        update_data = {key: value for key, value in update_data.items() if value is not None}
+
+        # Actualizar en la base de datos
+        result = await employees_dal.update_employee(fiscal_code, update_data)
+
+        return {"message": f"Employee with fiscal code: {fiscal_code} updated successfully"}
+
+    except HTTPException as e:
+        raise e
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.patch("/update_access_permission/{po_number}/{old_protocol_number}")
 async def update_access_permission(
@@ -386,14 +471,9 @@ async def upload_file(first_name: str = Form(...),
                       file: UploadFile = File(...),
                       image: UploadFile = File(...),
                       employees_dal: EmployeesDAL = Depends(get_employees_dal)):
-    print(first_name)
-    print(last_name)
-    print(file.filename)
-    print(image.filename)
+    
     file_location = os.path.join(os.getenv("UPLOAD_DIR"), file.filename)
     image_location = os.path.join(os.getenv("UPLOAD_DIR"), image.filename)
-    print(file_location)
-    print(image_location)
     with open(file_location, "wb") as f:
         f.write(await file.read())
     
@@ -405,16 +485,16 @@ async def upload_file(first_name: str = Form(...),
         return {"Message":"File Uploaded"}
 
     except HTTPException as e:
-        print(e)
+        
         raise HTTPException(status_code=e.status_code, detail=e.detail)
     
 
 @router.get("/retrieve_files/{fiscal_code}/")
 async def retrieve_files(fiscal_code: str, employees_dal : EmployeesDAL = (Depends(get_employees_dal))):
     file_path = os.path.join(os.getenv("UPLOAD_DIR"),fiscal_code,"profile_image.png")
-    print(file_path)
+
     formated_file_path = format_path(file_path)
-    print(formated_file_path)
+
 
     if not os.path.exists(formated_file_path):
         raise HTTPException(status_code=400,detail="Path's doesn't exist")
@@ -423,7 +503,6 @@ async def retrieve_files(fiscal_code: str, employees_dal : EmployeesDAL = (Depen
 @router.get("/download/{fiscalCode}/{name}")
 async def download_file(fiscalCode: str, name: str):
     file_path = os.path.join(os.getenv("UPLOAD_DIR"), fiscalCode, name)
-    print(file_path)
     if not os.path.exists(file_path):  # Verifica que el archivo exista
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(

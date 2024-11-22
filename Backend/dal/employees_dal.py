@@ -107,12 +107,11 @@ class EmployeesDAL:
                     "user_name": user_name
                     },
                 "purchase_order":purchase_order,
-                "files": {
-                    "profile_image_path":profile_image_path,
-                    "id_card_path":id_card_path,
-                    "visa_path":visa_path,
-                    "unilav_path":unilav_path
-                    } 
+                "profile_image_path":profile_image_path,
+                "id_card_path":id_card_path,
+                "visa_path":visa_path,
+                "unilav_path":unilav_path
+        
                 }
             )
             #print(new)

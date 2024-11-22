@@ -60,11 +60,7 @@ class PurchaseOrder(BaseModel):
     access_permission: Optional[list[AccessPermission]] = None
     subapalto : Optional[Subapalto] = None
 
-class Files(BaseModel):
-    profile_image_path: Optional[str] = None
-    id_card_path: Optional[str] = None
-    visa_path: Optional[str] = None
-    unilav_path: Optional[str] = None
+
 
 
 class Person(BaseModel):
@@ -82,7 +78,11 @@ class Person(BaseModel):
     user_credentials : UserCredentials
     #purchase_order: Optional[list[PurchaseOrder]] = Field(default_factory=  lambda: [PurchaseOrder()])
     purchase_order: Optional[list[PurchaseOrder]]
-    files : Optional[Files]
+    profile_image_path: Optional[str] = None
+    id_card_path: Optional[str] = None
+    visa_path: Optional[str] = None
+    unilav_path: Optional[str] = None
+    
     # Static methods are used to deserealize the mongoDB document into
     # a (Python) Person instace 
     @staticmethod
@@ -101,7 +101,11 @@ class Person(BaseModel):
             visa_end_date=doc["visa_end_date"],
             user_credentials=doc["user_credentials"],
             purchase_order=doc["purchase_order"],
-            files=doc["files"]
+            profile_image_path=doc["profile_image_path"],
+            id_card_path=doc["id_card_path"],
+            visa_path=doc["visa_path"],
+            unilav_path=doc["unilav_path"]
+            
         )
     
     # Example data
@@ -172,18 +176,11 @@ class ModifiedEmployee(BaseModel):
     visa_start_date:Optional[datetime]=None
     visa_end_date:Optional[datetime]=None
     user_credentials : Optional[ModifiedUserCredentials] = None
-
 class AccessPermissionRequest(BaseModel):
     fiscal_code: str  # Agrega fiscal_code aquí
     po_number: list[str]
     access_permission: AccessPermission
 
-
-class Document(BaseModel):
-    first_name: str
-    last_name: str
-    profile_picture: str
-    document: str
 
 
 
