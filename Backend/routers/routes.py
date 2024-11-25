@@ -13,6 +13,7 @@ from jwt.exceptions import InvalidTokenError
 from typing import Annotated, Any, Dict, Optional
 import os
 from dotenv import load_dotenv
+from routers.utils import format_path,save_files
 load_dotenv()
 
 router = APIRouter()
@@ -23,23 +24,12 @@ router.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 Utils
 """
 
-def format_path(file_path: str) -> str:
-    normalized_path = os.path.normpath(file_path)  # Normaliza la ruta
-    return normalized_path.replace(os.path.sep, "/")  # Reemplaza '\' por '/'
-
+#def format_path(file_path: str) -> str:
+#    normalized_path = os.path.normpath(file_path)  # Normaliza la ruta
+#    return normalized_path.replace(os.path.sep, "/")  # Reemplaza '\' por '/'
+"""
 async def save_files(files: list[UploadFile], file_names: list[str], root_dir: str) -> list[str]:
-    """
-    Guarda una lista de archivos en el directorio especificado con nombres personalizados
-    y devuelve las rutas de los archivos guardados.
 
-    Args:
-        files (list[UploadFile]): Archivos a guardar.
-        file_names (list[str]): Lista de nombres personalizados para los archivos.
-        root_dir (str): Directorio raíz donde se guardarán los archivos.
-
-    Returns:
-        list[str]: Lista de rutas de los archivos guardados.
-    """
     if not files:
         raise ValueError("No files provided")
     
@@ -65,6 +55,7 @@ async def save_files(files: list[UploadFile], file_names: list[str], root_dir: s
         saved_file_paths.append(formatted_file_location)
 
     return saved_file_paths
+"""
 
 """
 Application ENDPOINTS

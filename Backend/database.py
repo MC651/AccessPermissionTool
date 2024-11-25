@@ -29,7 +29,6 @@ class Database:
 # Instance of DB Class
 database = Database()
 
-
 async def get_employees_dal() -> EmployeesDAL:
     """
     Async function to access application Database

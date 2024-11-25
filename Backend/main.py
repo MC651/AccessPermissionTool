@@ -4,18 +4,18 @@ from database import Database
 from contextlib import asynccontextmanager
 from database import database
 from fastapi.middleware.cors import CORSMiddleware
-import gridfs
 
+# Application instance which creates the server
 app = FastAPI()
 
-# Permitir solicitudes desde http://localhost:3000
+# Origins that are allowed to access the application
 origins = [
     "http://localhost:5173",
     "http://localhost:5172",
 
 ]
 
-# Assigment of the routers to the main app & the lifespa
+# Assigment of the routers to the main app & the lifespan
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
@@ -26,10 +26,13 @@ async def lifespan(app: FastAPI):
     yield
 
     await database.close()
+#Lifespan of application
+app = FastAPI(lifespan=lifespan)
+
+#Router added to the application
+app.include_router(routes.router)
 
 #Middleware to allow CORS to don't block communication with external URLs
-app = FastAPI(lifespan=lifespan)
-app.include_router(routes.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
