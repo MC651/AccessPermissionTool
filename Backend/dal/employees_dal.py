@@ -6,51 +6,86 @@ from passlib.context import CryptContext
 from pymongo.errors import DuplicateKeyError
 import json
 
+#Password Context for hashing algorithm bcrypt
 pwd_context = CryptContext(schemes=["bcrypt"],deprecated="auto")
 
 class EmployeesDAL:
     """
     Data Acces Layer (Querys logic to database via Async Mongo DB Driver "Motor")
-
-    Methods:
-    list_employees (firs_name):
-        return the whole information of a user based on a parameter
-    
-    list_all_employees (first_name):
-        return a list of all the employees in the database
-
-    create_employee (Person Class):
-        creates a employee based on the Class Person structure
-
-    update_employee (fiscal_code, New_Employee Class)
-        updates a employee based on the information send to the query
-        only updates the data sent
-
-    delete_employee (fiscal_code):
-        deletes a employee based on the fisal code as key
     """
     def __init__(self, db):
         # Collection selected "Employees"
         self._db_collection = db.employees
-    
-
+    """
+    FIND methods
+    """
     async def list_employees(self, fiscal_code: str) -> Person:
+        """
+        Returns a Person instance from the database based on the fiscal code.
+        Args:
+            fiscal_code (str): The fiscal code of the employee.
+
+        Returns:
+            Person: The Person instance.
+        """
         document = await self._db_collection.find_one({"fiscal_code": fiscal_code})
         if not document:
             raise HTTPException(status_code=404, detail="Employee not found")
         return document
         
+    async def get_all(self):
+        """
+        Retrieves all employees filtered from the database 
+
+        Returns:
+            AsyncGenerator[FilteredEmployee, None, None]: An asynchronous generator that yields FilteredEmployee instances.
+        """
+
+        async for doc in self._db_collection.find({},
+                                                    projection={
+                                                        "_id": 0,
+                                                        "user_credentials": 0,
+                                                        "birth_date": 0,
+                                                        "id_card_end_date": 0,
+                                                        "contract_type": 0,
+                                                        "visa_start_date": 0,
+                                                        "visa_end_date": 0,
+                                                        "profile_image_path": 0,
+                                                        "id_card_path": 0,
+                                                        "visa_path": 0,
+                                                        "unilav_path": 0
+                                                    },
+                                                    sort={"first_name": 1}):
+            
+            yield FilteredEmployee.from_doc(doc)
     
     async def find_user_name(self,user_name:str)-> Person:
+        """
+        Returns a Person instance from the database based on the user name.
+        Args:
+            user_name (str): The user name of the employee.
+
+        Returns:
+            Person: The Person instance.
+        """
         document = await self._db_collection.find_one({"user_credentials.user_name": user_name},)
         if not document:
             raise HTTPException(status_code=404, detail="User not found")
         return Person.from_doc(document)
 
     
-    async def email_password_verification(self,user_name:str,typed_password:str):
+    async def email_password_verification(self,user_name:str,
+                                          typed_password:str):
+        """
+        Verifies the email and password of an employee.
+        Args:
+            user_name (str): The user name of the employee.
+            typed_password (str): The typed password of the employee.
+
+        Returns:
+            Person: The Person instance.
+        """
         user = await self._db_collection.find_one({"user_credentials.user_name":user_name})
-        #print(user["user_credentials"]["user_name"])
         if user is not None:                   
             hashed_password = user["user_credentials"]["password"]
             is_valid_password = await self.check_hassh(typed_password,hashed_password)
@@ -61,12 +96,33 @@ class EmployeesDAL:
             raise HTTPException(status_code=400, detail="User Name doesn't exist, register now!")
            
     
-    async def check_hassh(self,typed_password:str,hashed_password:str):
+    async def check_hassh(self,typed_password:str,
+                              hashed_password:str):
+        """
+        Checks if the typed password matches the hashed password.
+        Args:
+            typed_password (str): The typed password.
+            hashed_password (str): The hashed password.
+
+        Returns:
+            bool: True if the typed password matches the hashed password, False otherwise.
+        """
         return pwd_context.verify(typed_password,hashed_password)
     
     async def hash_password(self,password:str):
+        """
+        Hashes the password using the bcrypt algorithm.
+        Args:
+            password (str): The password to be hashed.
+
+        Returns:
+            str: The hashed password.
+        """
         return pwd_context.hash(password)
-        
+    
+    """
+    INSERT methods
+    """
     async def create_employee(self,
                               first_name:str,
                               last_name:str,
@@ -88,6 +144,32 @@ class EmployeesDAL:
                               unilav_path:str,
                               user_type:str = 'user'
                               ):
+        """
+        Creates a new employee in the database.
+        Args:
+            first_name (str): The first name of the employee.
+            last_name (str): The last name of the employee.
+            fiscal_code (str): The fiscal code of the employee.
+            birth_date (datetime): The birth date of the employee.
+            id_card_end_date (datetime): The end date of the employee's ID card.
+            contract_type (str): The type of contract the employee has.
+            contract_validity_start_date (datetime): The start date of the contract validity.
+            contract_validity_end_date (datetime): The end date of the contract validity.
+            visa_start_date (datetime): The start date of the employee's visa.
+            visa_end_date (datetime): The end date of the employee's visa.
+            email (EmailStr): The email address of the employee.
+            password (str): The password of the employee.
+            purchase_order (list): The purchase order of the employee.
+            profile_image_path (str): The path of the employee's profile image.
+            id_card_path (str): The path of the employee's ID card.
+            visa_path (str): The path of the employee's visa.
+            unilav_path (str): The path of the employee's unilav.
+            user_type (str): The type of user (default is 'user').
+
+        Returns:        
+            dict: A dictionary containing a message indicating the success or failure of the operation.
+
+        """
         try: 
             new = await self._db_collection.insert_one(
                 {"first_name":first_name,
@@ -148,6 +230,26 @@ class EmployeesDAL:
                                     subapalto_status:str,
                                     access_permission:list[AccessPermission],
                                     ):
+        """
+        Creates a purchase order in the database.
+        Args:
+            fiscal_codes (list[str]): The fiscal codes of the employees involved in the purchase order.
+            po_number (str): The purchase order number.
+            description (str): The description of the purchase order.
+            issue_date (datetime): The issue date of the purchase order.
+            validity_end_date (datetime): The end date of the purchase order's validity.
+            duvri (bool): Whether the purchase order is duvri or not.
+            requester_first_name (str): The first name of the requester.
+            requester_last_name (str): The last name of the requester.
+            requester_email (str): The email address of the requester.
+            locations (list[str]): The locations of the purchase order.
+            subapalto_number (str): The subapalto number of the purchase order.
+            subapalto_status (str): The subapalto status of the purchase order.
+            access_permission (list[AccessPermission]): The access permissions of the purchase order.
+
+        Returns:
+            dict: A dictionary containing a message indicating the success or failure of the operation.
+        """
 
         if len(access_permission) == 0:
             access_permission_dicts = []
@@ -197,7 +299,27 @@ class EmployeesDAL:
                                 subapalto_status: str,
                                 access_permission: list[AccessPermission]
                                 ):
-        # Verificar si el empleado con el fiscal_code existe
+        """
+        Inserts a purchase order in a employee's purchase order list if it doesn't already exist.
+        Args:
+            fiscal_code (str): The fiscal code of the employee.
+            po_number (str): The purchase order number.
+            description (str): The description of the purchase order.
+            issue_date (datetime): The issue date of the purchase order.
+            validity_end_date (datetime): The end date of the purchase order's validity.
+            duvri (bool): Whether the purchase order is duvri or not.
+            requester_first_name (str): The first name of the requester.
+            requester_last_name (str): The last name of the requester.
+            requester_email (str): The email address of the requester.
+            locations (list[str]): The locations of the purchase order.
+            subapalto_number (str): The subapalto number of the purchase order.
+            subapalto_status (str): The subapalto status of the purchase order.
+            access_permission (list[AccessPermission]): The access permissions of the purchase order.
+
+        Returns:
+            dict: A dictionary containing a message indicating the success or failure of the operation.
+        """
+    
         employee = await self._db_collection.find_one({"fiscal_code": fiscal_code})
 
         if employee is None:
@@ -242,6 +364,22 @@ class EmployeesDAL:
                                        address:str,
                                        gates:list[int]
                                        ):
+        
+        """
+        Inserts an access permission in a purchase order that already exists.
+        Args:
+            fiscal_code (str): The fiscal code of the employee.
+            po_number (list[str]): The purchase order numbers of the purchase orders to be updated.
+            protocol_number (str): The protocol number of the access permission.
+            plant (str): The plant of the access permission.
+            status (str): The status of the access permission.
+            validity_end_date (datetime): The end date of the access permission's validity.
+            address (str): The address of the access permission.
+            gates (list[int]): The gates of the access permission.
+
+        Returns:
+            dict: A dictionary containing a message indicating the success or failure of the operation.
+        """
 
         create_access_permission = await self._db_collection.update_many(
             {"fiscal_code": fiscal_code,
@@ -259,15 +397,23 @@ class EmployeesDAL:
 
         if create_access_permission.modified_count > 0:
             return create_access_permission
-            #raise HTTPException(status_code=200, detail=f"{create_access_permission.modified_count} Access permission(s) inserted successfully.")
         else:
             raise HTTPException(status_code=400, detail="Error trying to insert access permission")
             
-        
+    """
+    UPDATE methods
+    """
+    async def update_employee(self, fiscal_code:str, update_data : ModifiedEmployee): 
+        """
+        Updates an employee in the database.
 
-    
-    #async def update_employee(self, fiscal_code:str, update_data : dict):
-    async def update_employee(self, fiscal_code:str, update_data : ModifiedEmployee):   
+        Args:
+            fiscal_code (str): The fiscal code of the employee.
+            update_data (ModifiedEmployee): The modified employee data.
+
+        Returns:
+            dict: A dictionary containing a message indicating the success or failure of the operation.
+        """  
         try: 
             updated_employee = await self._db_collection.find_one_and_update(
                 {"fiscal_code": fiscal_code},
@@ -299,13 +445,22 @@ class EmployeesDAL:
                                         po_number:str,
                                         old_protocol_number:str,
                                         update_data:dict):
+        """
+        Updated an access permission in a purchase order.
+
+        Args:
+            po_number (str): The purchase order number.
+            old_protocol_number (str): The old protocol number of the access permission.
+            update_data (dict): The updated access permission data.
+
+        Returns:
+            dict: A dictionary containing a message indicating the success or failure of the operation.
+        """
         
         update_query = {"$set": {}}
         for key, value in update_data.items():
             update_query["$set"][f"purchase_order.$[po].access_permission.$[ap].{key}"] = value
-        #print(update_query) 
-
-        #print(update_data)
+        
         access_permission = await self._db_collection.update_many(
             {"purchase_order.po_number":po_number,
             "purchase_order.access_permission.protocol_number":old_protocol_number},
@@ -316,8 +471,7 @@ class EmployeesDAL:
         
         if access_permission.modified_count <= 0:
             raise HTTPException(status_code=404, detail="Access Permission not inserted")
-        
-        #print(access_permission.modified_count)
+    
         return access_permission
         
        
@@ -326,6 +480,16 @@ class EmployeesDAL:
                                     old_po_number:str,
                                     update_data:dict):
         
+        """
+        Updates a purchase order in the database.
+
+        Args:
+            old_po_number (str): The old purchase order number.
+            update_data (dict): The updated purchase order data.
+
+        Returns:
+            dict: A dictionary containing a message indicating the success or failure of the operation.
+        """
         update_query = {"$set": {}}
         for key, value in update_data.items():
             if isinstance(value,dict):
@@ -345,8 +509,19 @@ class EmployeesDAL:
         else:
             raise HTTPException(status_code=400, detail=f"Order trying to update PO: {old_po_number}")
         
-    
+    """
+    DELETE methods
+    """
     async def delete_employee(self,fiscal_code:str):
+        """
+        Deletes an employee from the database.
+
+        Args:
+            fiscal_code (str): The fiscal code of the employee.
+
+        Returns:
+            dict: A dictionary containing a message indicating the success or failure of the operation.
+        """
 
         find_first = await self._db_collection.find_one({"fiscal_code":fiscal_code})
 
@@ -362,6 +537,15 @@ class EmployeesDAL:
 
     async def delete_purchase_order(self,
                                     po_number:str):
+        """
+        Deletes a purchase order from the database.
+
+        Args:
+            po_number (str): The purchase order number.
+
+        Returns:
+            dict: A dictionary containing a message indicating the success or failure of the operation.
+        """
         
         delete_purchase_order = await self._db_collection.update_many(
                                     {"purchase_order.po_number":po_number},
@@ -373,31 +557,6 @@ class EmployeesDAL:
             
         raise HTTPException(status_code=400, detail=f"Failed to delete purchase order with {po_number}")
 
-    async def get_all(self):
-        async for doc in self._db_collection.find({},
-                                                    projection={
-                                                        "_id": 0,
-                                                        "user_credentials": 0,
-                                                        "birth_date": 0,
-                                                        "id_card_end_date": 0,
-                                                        "contract_type": 0,
-                                                        "visa_start_date": 0,
-                                                        "visa_end_date": 0
-                                                    },
-                                                    sort={"first_name": 1}):
-            
-            yield FilteredEmployee.from_doc(doc)
-
-    async def process_files(self,first_name: str, last_name: str, image_path: str, document_path: str):
-        insert_files = await self._db_collection.insert_one(
-                                {"first_name": first_name,
-                                 "last_name": last_name,
-                                 "image_path": image_path,
-                                 "document_path": document_path
-                                })
-        if not insert_files:
-            raise HTTPException(status_code=400, detail="Error trying to insert files")
-        return insert_files
                     
 
 

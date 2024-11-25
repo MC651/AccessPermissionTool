@@ -29,7 +29,15 @@ class AccessPermission(BaseModel):
 
     @staticmethod
     def to_dict(access_permission: 'AccessPermission') -> dict:
-        """Converts an AccessPermission instance to a dictionary."""
+        """
+        Converts an AccessPermission instance to a dictionary.
+        Args:
+            access_permission (AccessPermission): The AccessPermission instance to be converted.
+
+        Returns:
+            dict: The dictionary representation of the AccessPermission instance.
+        
+        """
         return {
             "protocol_number": access_permission.protocol_number,
             "plant": access_permission.plant,
@@ -41,7 +49,15 @@ class AccessPermission(BaseModel):
 
     @staticmethod
     def list_to_dict(access_permissions: list['AccessPermission']) -> list[dict]:
-        """Converts a list of AccessPermission instances to a list of dictionaries."""
+        """
+        Converts a list of AccessPermission instances to a list of dictionaries.
+        Args:
+            access_permissions (list[AccessPermission]): The list of AccessPermission instances to be converted.
+
+        Returns:
+            list[dict]: The list of dictionaries representation of the AccessPermission instances.
+        
+        """
         return [AccessPermission.to_dict(ap) for ap in access_permissions]
 
 
@@ -59,10 +75,6 @@ class PurchaseOrder(BaseModel):
     duvri : Optional[bool] = None
     access_permission: Optional[list[AccessPermission]] = None
     subapalto : Optional[Subapalto] = None
-
-
-
-
 class Person(BaseModel):
     _id: Optional[str]
     first_name: str
@@ -87,6 +99,14 @@ class Person(BaseModel):
     # a (Python) Person instace 
     @staticmethod
     def from_doc(doc) -> "Person":
+        """
+        Returns a Person instance from a MongoDB document.
+        Args:
+            doc (dict): The MongoDB document to be deserialized.
+
+        Returns:
+            Person: The Person instance.
+        """
         return Person(
             id=str(doc["_id"]),
             first_name=doc["first_name"],
@@ -107,30 +127,6 @@ class Person(BaseModel):
             unilav_path=doc["unilav_path"]
             
         )
-    
-    # Example data
-"""     class Config:
-        json_schema_extra = {
-            "example" : {
-                "first_name" : "Cesar",
-                "last_name" : "Borja",
-                "fiscal_code" : "MLLSNT82P65Z404U",
-                "birth_date" : '2024-09-20T19:37:25.724+00:00',
-                "id_card_end_date" : '2024-09-20T19:37:25.724+00:00',
-                "contract_type" : "temporary",
-                "contract_validity_start_date" : '2024-09-20T19:37:25.724+00:00',
-                "contract_validity_end_date" : '2024-09-20T19:37:25.724+00:00',
-                "visa_start_date" : '2024-09-20T19:37:25.724+00:00',
-                "visa_end_date" : '2024-09-20T19:37:25.724+00:00',
-                "user_credentials" : {
-                    "email" : "cborjaruiz@micla.info",
-                    "user_name" : "Cborja",
-                    "password" : "encrypted_password"
-                },
-                "purchase_order" : []
-            }
-        } """
-
 
 class Token(BaseModel):
     access_token: str
@@ -150,6 +146,14 @@ class FilteredEmployee(BaseModel):
 
     @staticmethod
     def from_doc(doc) -> "FilteredEmployee":
+        """
+        Returns a FilteredEmployee instance from a MongoDB document.
+        Args:
+            doc (dict): The MongoDB document to be deserialized.
+
+        Returns:
+            FilteredEmployee: The FilteredEmployee instance.
+        """
         return FilteredEmployee(
             first_name=doc["first_name"],
             last_name=doc["last_name"],
