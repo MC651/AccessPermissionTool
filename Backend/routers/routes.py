@@ -139,6 +139,49 @@ async def get_all_employees(employees_dal: EmployeesDAL = Depends(get_employees_
     """
     return [employee async for employee in  employees_dal.get_all()]
 
+@router.get("/retrieve_files/{fiscal_code}/")
+async def retrieve_files(fiscal_code: str, employees_dal : EmployeesDAL = (Depends(get_employees_dal))):
+    """
+    Retrieves the files of an employee.
+
+    Args:
+        fiscal_code (str): The fiscal code of the employee.
+        employees_dal (EmployeesDAL): The employees DAL.
+
+    Returns:
+        FileResponse: The file response of the file.
+
+    """
+    file_path = os.path.join(os.getenv("UPLOAD_DIR"),fiscal_code,"profile_image.png")
+
+    formated_file_path = format_path(file_path)
+
+
+    if not os.path.exists(formated_file_path):
+        raise HTTPException(status_code=400,detail="Path's doesn't exist")
+    return FileResponse(file_path)
+
+@router.get("/download/{fiscalCode}/{name}")
+async def download_file(fiscalCode: str, name: str):
+    """
+    Downloads a file.
+
+    Args:
+        fiscalCode (str): The fiscal code of the employee.
+        name (str): The name of the file.
+
+    Returns:
+        FileResponse: The file response of the file.
+    
+    """
+    file_path = os.path.join(os.getenv("UPLOAD_DIR"), fiscalCode, name)
+    if not os.path.exists(file_path):  
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(
+        path=file_path,
+        filename=name
+    )
+
 """
 POST Methods
 """
@@ -588,48 +631,7 @@ async def delete_purchase_order(po_number:str,
     except HTTPException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
-@router.get("/retrieve_files/{fiscal_code}/")
-async def retrieve_files(fiscal_code: str, employees_dal : EmployeesDAL = (Depends(get_employees_dal))):
-    """
-    Retrieves the files of an employee.
 
-    Args:
-        fiscal_code (str): The fiscal code of the employee.
-        employees_dal (EmployeesDAL): The employees DAL.
-
-    Returns:
-        FileResponse: The file response of the file.
-
-    """
-    file_path = os.path.join(os.getenv("UPLOAD_DIR"),fiscal_code,"profile_image.png")
-
-    formated_file_path = format_path(file_path)
-
-
-    if not os.path.exists(formated_file_path):
-        raise HTTPException(status_code=400,detail="Path's doesn't exist")
-    return FileResponse(file_path)
-
-@router.get("/download/{fiscalCode}/{name}")
-async def download_file(fiscalCode: str, name: str):
-    """
-    Downloads a file.
-
-    Args:
-        fiscalCode (str): The fiscal code of the employee.
-        name (str): The name of the file.
-
-    Returns:
-        FileResponse: The file response of the file.
-    
-    """
-    file_path = os.path.join(os.getenv("UPLOAD_DIR"), fiscalCode, name)
-    if not os.path.exists(file_path):  
-        raise HTTPException(status_code=404, detail="File not found")
-    return FileResponse(
-        path=file_path,
-        filename=name
-    )
 
 
     
