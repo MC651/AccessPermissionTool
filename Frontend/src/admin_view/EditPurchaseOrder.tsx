@@ -185,7 +185,7 @@ const EditPurchaseOrder: React.FC<EditPurchaseOrderProps> = ({ open, handleClose
     }, [row, reset]);
     return (
         <>
-            <Dialog open={open} onClose={handleCloseEditPurchaseOrder} maxWidth="md" fullWidth>
+            <Dialog open={open} onClose={handleCloseEditPurchaseOrder} maxWidth="lg" fullWidth>
                 <DialogTitle>Edit Purchase Order</DialogTitle>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <DialogContent>

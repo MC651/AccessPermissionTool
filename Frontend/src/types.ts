@@ -1,5 +1,7 @@
 import { AlertColor } from '@mui/material/Alert';
 import { SubmitHandler } from 'react-hook-form';
+import {  UseFormSetValue, UseFormWatch, Control } from "react-hook-form";
+import { Breakpoint } from '@mui/material';
 
 export interface LoginFormInputs {
     username: string;
@@ -162,7 +164,7 @@ export interface CreateAccesPermission {
 
 export interface RegisterProps { 
     elevation_level?: number;
-    maxWidth?:string;
+   maxWidth: Breakpoint | false;
     marginRight?:number;
     isRegister?: boolean;
     marginTop?: number;
@@ -260,4 +262,25 @@ export interface MessageBarProps {
 export interface LoginFormProps {
   onSubmit: SubmitHandler<LoginFormInputs>;
   loading: boolean;
+}
+
+export interface FileUploadFieldProps {
+  isEdit?: boolean;
+  name: keyof Employee;
+  label: string;
+  accept: string;
+  control: Control<Employee>;
+  setValue: UseFormSetValue<Employee>;
+  watch: UseFormWatch<Employee>;
+  rules?: object; // Opcional: Validaciones como required
+  fiscalCode?:string;
+  fileExtension?:string;
+}
+
+export interface AdminColumnsProps {
+  handleOpenDialogPO: (row: Row) => void;
+  handleOpenDialogAP: (row: Row) => void;
+  handleOpenDeleteUser: (row: Row) => void;
+  handleOpenDeletePurchaseOrder: (row: Row) => void;
+  //getStatusColor: (status: string) => string;
 }

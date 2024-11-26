@@ -1,23 +1,10 @@
 import React, { useRef } from "react";
-import { Controller, UseFormSetValue, UseFormWatch, Control } from "react-hook-form";
+import { Controller} from "react-hook-form";
 import { Box, Button, TextField, IconButton } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ClearIcon from "@mui/icons-material/Clear";
-import { Employee } from "../types";
+import { FileUploadFieldProps } from "../types";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-
-interface FileUploadFieldProps {
-  isEdit?: boolean;
-  name: keyof Employee;
-  label: string;
-  accept: string;
-  control: Control<Employee>;
-  setValue: UseFormSetValue<Employee>;
-  watch: UseFormWatch<Employee>;
-  rules?: object; // Opcional: Validaciones como required
-  fiscalCode?:string;
-  fileExtension?:string;
-}
 
 const FileUploadField: React.FC<FileUploadFieldProps> = ({
   isEdit=false,

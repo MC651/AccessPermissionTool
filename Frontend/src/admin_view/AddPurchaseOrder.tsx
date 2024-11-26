@@ -8,12 +8,9 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { useSnackbar } from "../hooks/useSnackbar";
 import MessageBar from "../components/MessageBar";
 
-
-
 const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAddPurchaseOrder, fiscal_codes }) => {
   const [isLoading, setLoading] = useState(false);
   const [isOrderCreated, setisOrderCreated] = useState(false);
-  const [isAccessPermissionRequired, setAccessPermissionRequired] = useState(false);
   const {openSnackbar,snackBarMessage,snackbarSeverity,showSnackbar,handleCloseSnackbar} = useSnackbar();
 
   const handleClose = () => {
@@ -58,7 +55,7 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
       console.log(error);
       showSnackbar(error?.response?.data?.detail || "Error creating purchase order","error",true);
       setLoading(false);
-      setAccessPermissionRequired(false);
+      
     } finally {
       setTimeout(() => { 
         showSnackbar("","warning",false);
@@ -66,12 +63,12 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
         setisOrderCreated(false);
       }, 1500);
       reset();
-      setAccessPermissionRequired(false);
+     
     }
   };
 
   return (
-    <Dialog open={open} onClose={handleCloseAddPurchaseOrder} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={handleCloseAddPurchaseOrder} maxWidth="lg" fullWidth>
       <DialogTitle
         sx={{
           display: 'flex',
@@ -323,7 +320,7 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
               <Select
                 size="small"
                 {...register("purchase_order.subapalto.subapalto_status",
-                  { required: "Subapalto is required" })}
+                  { required: "Subapalto status is required" })}
                 error={!!errors.purchase_order?.subapalto?.subapalto_status}
                 displayEmpty
                 fullWidth
@@ -341,9 +338,6 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
               )}
             </FormControl>
           </Box>
-          <Button onClick={() => setAccessPermissionRequired(!isAccessPermissionRequired)} variant="contained" color="primary" sx={{ display: 'inline', marginTop: 2, marginBottom: 2 }} >Include Access Permission</Button>
-          {isAccessPermissionRequired && (
-            <>
               <Typography variant="h6" gutterBottom> Access Permission</Typography>
               <Divider sx={{ marginTop: 2, marginBottom: 2 }} />
               <Box sx={{ display: 'flex', gap: 2 }}>
@@ -352,7 +346,7 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
                   <TextField
                     size='small'
                     {...register("purchase_order.access_permission.protocol_number", {
-                      required: isAccessPermissionRequired ? "Protocol number is required" : false
+                      required: "Protocol number is required"
                     })}
                     error={!!errors.purchase_order?.access_permission?.protocol_number}
                     helperText={errors.purchase_order?.access_permission?.protocol_number?.message}
@@ -367,7 +361,7 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
                   <TextField
                     size='small'
                     {...register("purchase_order.access_permission.plant", {
-                      required: isAccessPermissionRequired ? "Plant is required" : false
+                      required: "Plant is required",
                     })}
                     error={!!errors.purchase_order?.access_permission?.plant}
                     helperText={errors.purchase_order?.access_permission?.plant?.message}
@@ -383,7 +377,7 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
                   <Select
                     size="small"
                     {...register("purchase_order.access_permission.status", {
-                      required: isAccessPermissionRequired ? "Access permission status is required" : false
+                      required: "Status is required",
                     })}
                     error={!!errors.purchase_order?.access_permission?.status}
                     displayEmpty
@@ -409,7 +403,7 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
                     size='small'
                     type="date"
                     {...register("purchase_order.access_permission.validity_end_date", {
-                      required: isAccessPermissionRequired ? "Validity end date is required" : false
+                      required: "Validity End Date is required",
                     })}
                     error={!!errors.purchase_order?.access_permission?.validity_end_date}
                     helperText={errors.purchase_order?.access_permission?.validity_end_date?.message}
@@ -425,11 +419,10 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
                   <TextField
                     size='medium'
                     {...register("purchase_order.access_permission.address", {
-                      required: isAccessPermissionRequired ? "Address is required" : false
+                      required: "Address is required",
                     })}
                     error={!!errors.purchase_order?.access_permission?.address}
                     helperText={errors.purchase_order?.access_permission?.address?.message}
-
                     fullWidth
                     variant="outlined"
                     placeholder='P.za Riccardo Cattaneo, 9, 10137 Torino TO, Italy'
@@ -441,8 +434,9 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
                     name="purchase_order.access_permission.gates"
                     control={control}
                     defaultValue={[]}
+    
                     rules={{
-                      required: isAccessPermissionRequired ? "Gates are required" : false
+                      required: "Gates are required",
                     }}
                     render={({ field }) => (
                       <TextField
@@ -459,8 +453,6 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
                   )}
                 </FormControl>
               </Box>
-            </>
-          )}
         </DialogContent>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
           <DialogActions sx={{ alignItems: 'center' }}>

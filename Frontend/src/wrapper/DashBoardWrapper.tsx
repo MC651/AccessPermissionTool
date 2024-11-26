@@ -1,13 +1,13 @@
-import { Avatar, createTheme, Stack } from '@mui/material';
+import { createTheme } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
-import { AppProvider, Router, type Navigation } from '@toolpad/core/AppProvider';
+import { AppProvider,type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from './useDemoRouter';
 import { DashboardWrapperProps } from '../types';
+import ToolBarImage from './ToolBarImage';
 
 const userType = localStorage.getItem("user_type")
-const fiscalCode = localStorage.getItem("fiscal_code")
 
 const NAVIGATION: Navigation = [
     {
@@ -61,16 +61,6 @@ const demoTheme = createTheme({
       },
     },
   });
-
-function ToolBarImage () {
-    const url = `http://localhost:8000/retrieve_files/${fiscalCode}/` 
-    return (
-        <Stack direction="row" spacing={2}>
-             <Avatar src={url} />
-        </Stack>
-
-    );
-}
 
 function DashboardWrapper({ children }: DashboardWrapperProps) {
     const router = useDemoRouter('/home');

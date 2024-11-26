@@ -58,7 +58,6 @@ const EditInformation: React.FC = () => {
   const isButtonDisabled = !(hasDirtyFields || hasNewProfileImage || hasNewIdCard || hasNewVisa || hasNewUnilav);
 
   const onSubmit = handleSubmit(async (data: Employee) => {
-  console.log(data);
   setIsLoading(true);
 
   const updatedFields = Object.keys(dirtyFields).reduce((acc, key) => {

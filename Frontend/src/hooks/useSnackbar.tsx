@@ -10,9 +10,6 @@ export const useSnackbar = (): UseSnackbarResult => {
         setSnackBarMessage(message);
         setSnackbarSeverity(severity);
         setOpenSnackbar(open);
-        console.log(message);
-        console.log(severity);
-        console.log(open);
     };
 
     const handleCloseSnackbar = () => {
