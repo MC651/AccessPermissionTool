@@ -164,10 +164,11 @@ export interface CreateAccesPermission {
 
 export interface RegisterProps { 
     elevation_level?: number;
-   maxWidth: Breakpoint | false;
+    maxWidth: Breakpoint | false;
     marginRight?:number;
     isRegister?: boolean;
     marginTop?: number;
+    marginLeft?:number;
   }
 export interface Row {
     fiscal_code?:string,

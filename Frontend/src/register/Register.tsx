@@ -8,7 +8,7 @@ import { useSnackbar } from "../hooks/useSnackbar";
 import MessageBar from "../components/MessageBar";
 import FileUploadField from "../register/FileInput"
 
-const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, marginTop,marginRight,maxWidth }) => {
+const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, marginTop,marginRight,maxWidth,marginLeft }) => {
   const [isUserCreated, setIsUserCreated] = useState(false);
   const [loading, isLoading] = useState(false);
   const { register, handleSubmit, formState: { errors }, watch, reset, control, setValue } = useForm<Employee>();
@@ -76,7 +76,7 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
 
   return (
     <Container maxWidth={maxWidth} sx={{marginRight:marginRight}}>
-      <Paper sx={{ marginTop: marginTop, padding: 4, marginBottom: 8 }} elevation={elevation_level}>
+      <Paper sx={{ marginTop: marginTop, padding: 6, marginBottom: 8,marginLeft:marginLeft }} elevation={elevation_level}>
         <Box sx={{ maxWidth: 800, marginTop: 3, marginBottom: 3 }}>
           <Typography variant="h4" gutterBottom textAlign={"center"}>
             {isRegister ? "Register" : "Add New User"}

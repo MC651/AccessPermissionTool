@@ -66,7 +66,7 @@ export const Router = createBrowserRouter([
         element:
             <Autorized_Route allowed_roles={['admin']}>
                 <DashboardWrapper>
-                        <Register elevation_level={0} isRegister={false} marginRight={0} maxWidth="lg"/>
+                        <Register elevation_level={0} isRegister={false}  maxWidth="lg" marginLeft={10}/>
                 </DashboardWrapper>
             </Autorized_Route>,
     },
