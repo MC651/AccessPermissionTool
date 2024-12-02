@@ -1,5 +1,5 @@
 import React, { useEffect, useState,useRef } from "react";
-import { Row, EditPurchaseOrderProps, plantOptions } from "../types";
+import { Row, EditPurchaseOrderProps, plantOptions, FastAPIError } from "../types";
 import {Box, Button, Checkbox, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, FormHelperText, FormLabel, MenuItem, Select, Snackbar, TextField, Typography } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import SaveIcon from "@mui/icons-material/Save";
@@ -58,7 +58,7 @@ const EditPurchaseOrder: React.FC<EditPurchaseOrderProps> = ({ open, handleClose
         setIsAdded(true);
       }
       catch (error) {
-        showSnackbar(error?.response?.data?.detail,"error",true);
+        showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error creating user","error",true)
         setIsLoading(false);
       }
       finally {
@@ -141,7 +141,7 @@ const EditPurchaseOrder: React.FC<EditPurchaseOrderProps> = ({ open, handleClose
             setIsUpdated(true);
         }
         catch (error) {
-            showSnackbar(error?.response.data?.detail || "Error Updating Purchase Order","error",true);
+            showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error Updating Purchase Order","error",true);
             setIsLoading(false);
             console.error("Error:", error);
         }

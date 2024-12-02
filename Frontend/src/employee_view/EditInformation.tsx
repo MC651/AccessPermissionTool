@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useEmployee } from "../contexts/EmployeeContext";
 import { useForm } from "react-hook-form";
-import { Employee } from "../types";
+import { Employee, FastAPIError } from "../types";
 import axios from "axios";
 import { TextField, Button, Box, Typography, MenuItem, Container, Divider, FormControl, FormLabel, CircularProgress, Select } from "@mui/material";
 import Loading from "../components/Loading";
@@ -125,7 +125,7 @@ const EditInformation: React.FC = () => {
       console.log(response)
       //reset();
     } catch (error) {
-      showSnackbar(error?.response?.data?.detail || "Error updating data","error",true);
+      showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error updating data","error",true);
       setIsLoading(false);
       console.log(error)
       //console.log(error)

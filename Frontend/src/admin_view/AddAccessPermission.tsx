@@ -1,5 +1,5 @@
 import { Box,Button,CircularProgress,Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, MenuItem, Select, TextField } from '@mui/material';
-import { AccessPermisionDialogComponentProps, CreateAccesPermission} from '../types';
+import { AccessPermisionDialogComponentProps, CreateAccesPermission,FastAPIError} from '../types';
 import { Controller, useForm } from 'react-hook-form';
 import { useState } from 'react';
 import SaveIcon from "@mui/icons-material/Save";
@@ -7,6 +7,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import axios from 'axios';
 import { useSnackbar } from "../hooks/useSnackbar";
 import MessageBar from "../components/MessageBar";
+
 
 
 const AddAccessPermission: React.FC<AccessPermisionDialogComponentProps> = ({ open, handleCloseAccessPermission, fiscal_codes_with_purchase_orders }) => {
@@ -47,8 +48,7 @@ const AddAccessPermission: React.FC<AccessPermisionDialogComponentProps> = ({ op
             setIsAccessPermissionCreated(true);
             
         } catch (error) {
-            console.log(error);
-            showSnackbar(error?.response?.data?.detail || "Error creating access permission","error",true);
+            showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error creating access permission","error",true);
             console.log("Error", error);
         } finally {
             setTimeout (() => {

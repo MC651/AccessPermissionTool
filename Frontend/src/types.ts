@@ -285,3 +285,10 @@ export interface AdminColumnsProps {
   handleOpenDeletePurchaseOrder: (row: Row) => void;
   //getStatusColor: (status: string) => string;
 }
+export interface FastAPIError {
+  response?: {
+    data?: {
+      detail?: string;
+    };
+  };
+};

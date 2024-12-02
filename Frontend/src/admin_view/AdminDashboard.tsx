@@ -7,7 +7,7 @@ const AdminDashboard: React.FC = () => {
     
     return (
         <Container maxWidth="lg" sx={{ marginBottom: 2 }}>
-            {!loading && userInfo && (
+            {!loading && userInfo && !error && (
                 <Box sx={{ padding: 4 }}>
                     <Typography variant="h4" gutterBottom textAlign={"center"}>Administrator Dashboard</Typography>
                     <Divider sx={{ marginTop: 2, marginBottom: 2 }} />

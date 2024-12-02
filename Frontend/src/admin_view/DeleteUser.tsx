@@ -1,5 +1,5 @@
 import { Alert, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider } from "@mui/material";
-import { DeleteUserProps } from "../types";
+import { DeleteUserProps, FastAPIError } from "../types";
 import CancelIcon from "@mui/icons-material/Cancel";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from 'axios';
@@ -24,7 +24,7 @@ const DeleteUser: React.FC<DeleteUserProps> = ({ open, handleCloseDeleteUser, ro
             setIsLoading(false);
             setIsDeleted(true);
         }catch (error) {
-            showSnackbar(error?.response?.data?.detail || "Error deleting User","error",true)
+            showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error deleting User","error",true)
             setIsLoading(false);
         }
         finally {

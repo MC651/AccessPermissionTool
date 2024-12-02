@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import axios from "axios";
 import {TextField,Button,Box,Typography,Container, Paper} from "@mui/material"; // Importar componentes de MUI
-import { LoginFormInputs } from "../types";
+import { FastAPIError, LoginFormInputs } from "../types";
 import { useSnackbar } from "../hooks/useSnackbar";
 import MessageBar from "../components/MessageBar";
 
@@ -36,7 +36,7 @@ const Login: React.FC = () => {
       }, 2000);
     }
     catch (error) {
-      showSnackbar(error.response?.data?.detail || "Error loggin in", "error",true);
+      showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error loggin in", "error",true);
       console.error("Error:", error);
     } finally {
       setTimeout(() => {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Employee, RegisterProps } from "../types";
+import { Employee, FastAPIError, RegisterProps } from "../types";
 import { Box, Button, FormControl, FormLabel, TextField, MenuItem, Select, Typography, Container, Paper, Divider, CircularProgress } from "@mui/material";
 import { useSnackbar } from "../hooks/useSnackbar";
 import MessageBar from "../components/MessageBar";
@@ -62,7 +62,7 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
       isLoading(false);
       //reset();
     } catch (error) {
-      showSnackbar(error?.response?.data?.detail, "error", true);
+      showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error creating user", "error", true);
       isLoading(false);
       console.error("Error:", error);
     }

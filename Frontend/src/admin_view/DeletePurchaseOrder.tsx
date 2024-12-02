@@ -1,5 +1,5 @@
 import { Alert, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider } from "@mui/material";
-import {DeletePurchaseOrderProps} from "../types";
+import {DeletePurchaseOrderProps, FastAPIError} from "../types";
 import CancelIcon from "@mui/icons-material/Cancel";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from 'axios';
@@ -22,7 +22,7 @@ const DeletePurchaseOrder: React.FC<DeletePurchaseOrderProps> = ({ open, handleC
             showSnackbar(response.data.message,"success",true)
             setIsDeleted(true);
         }catch (error) {
-            showSnackbar(error?.response?.data?.detail || "Erro creating Purchase Order","error",true)
+            showSnackbar((error as FastAPIError)?.response?.data?.detail || "Erro creating Purchase Order","error",true)
             setIsLoading(false);
         }
         finally {

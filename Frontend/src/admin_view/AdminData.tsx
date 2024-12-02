@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { FastAPIError } from "../types";
 
 const useAdminDashboard = () => {
     const [loading, setLoading] = useState(false);
@@ -18,7 +19,7 @@ const useAdminDashboard = () => {
             }
             catch (error) {
                 setLoading(false);
-                setError(error?.response?.data?.detail || "Error on fetching users");
+                setError((error as FastAPIError)?.response?.data?.detail || "Error on fetching users");
             }
             finally {
                 setLoading(false);

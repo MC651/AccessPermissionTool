@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { EditTableProps, Row } from "../types";
-import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, MenuItem, Select, Snackbar, TextField } from "@mui/material";
+import { EditTableProps, FastAPIError, Row } from "../types";
+import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, MenuItem, Select, TextField } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -54,7 +54,7 @@ const EditAccessPermission: React.FC<EditTableProps> = ({ open, handleCloseEditT
       setIsUpdated(true);
     }
     catch (error) {
-      showSnackbar(error?.response?.data?.detail || "Error Updating Access Permission","error",true)
+      showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error Updating Access Permission","error",true)
       setIsLoading(false);
     }
     finally {

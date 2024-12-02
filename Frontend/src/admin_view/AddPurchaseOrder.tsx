@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CreatePurchaseOrder, DialogComponentProps, plantOptions } from "../types";
+import { CreatePurchaseOrder, DialogComponentProps, plantOptions,FastAPIError } from "../types";
 import { Controller, useForm } from "react-hook-form";
 import axios from "axios";
 import { Alert, Box, Button, Checkbox, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, FormHelperText, FormLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
@@ -53,7 +53,7 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
       
     } catch (error) {
       console.log(error);
-      showSnackbar(error?.response?.data?.detail || "Error creating purchase order","error",true);
+      showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error creating purchase order","error",true);
       setLoading(false);
       
     } finally {

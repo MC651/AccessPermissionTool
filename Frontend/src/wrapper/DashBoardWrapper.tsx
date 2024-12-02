@@ -7,6 +7,7 @@ import { useDemoRouter } from './useDemoRouter';
 import { DashboardWrapperProps } from '../types';
 import ToolBarImage from './ToolBarImage';
 
+
 const userType = localStorage.getItem("user_type")
 
 const NAVIGATION: Navigation = [
@@ -65,8 +66,16 @@ const demoTheme = createTheme({
 function DashboardWrapper({ children }: DashboardWrapperProps) {
     const router = useDemoRouter('/home');
     return (
-        <AppProvider navigation={NAVIGATION} router={router} theme={demoTheme} >
-            <DashboardLayout slots={{toolbarActions:ToolBarImage}}>
+        <AppProvider 
+        navigation={NAVIGATION} 
+        router={router} 
+        theme={demoTheme} 
+        branding={{
+            logo: <img src="public\images\logo_corporate.png" alt="logo" />,
+            title: '',
+        }}
+        >
+            <DashboardLayout slots={{toolbarActions:ToolBarImage}} >
                 {children}
             </DashboardLayout>
         </AppProvider>
