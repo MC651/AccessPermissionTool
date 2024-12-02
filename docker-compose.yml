@@ -1,0 +1,34 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 28017:27017  # Exponer el puerto 27017 dentro del contenedor al puerto 28017 del host
+    volumes:
+      - mongo-data:/data/db  # Volumen persistente para MongoDB
+
+  fastapi:
+    build: ./backend  # El directorio donde está tu Dockerfile para FastAPI
+    container_name: fastapi
+    env_file:
+      - ./backend/.env  # Cargar variables de entorno desde el archivo .env
+    ports:
+      - "8000:8000"  # Exponer el puerto 8000
+    depends_on:
+      - mongo  # Asegurarse de que MongoDB esté disponible antes de iniciar FastAPI
+    networks:
+      - app-network
+    command: ["./wait-for-it.sh", "mongo:27017", "--", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+volumes:
+  mongo-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
+
+
