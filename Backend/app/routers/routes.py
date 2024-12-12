@@ -5,6 +5,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import EmailStr
+
+
 from app.models.Person import Person
 from app.models.Token import Token
 from app.models.FilteredEmployee import FilteredEmployee
@@ -14,7 +16,9 @@ from app.dal.employees_dal import EmployeesDAL
 from app.database.dependencies import get_employees_dal
 from app.routers.auth import create_access_token
 from app.routers.utils import format_path,save_files
-from app.routers.auth import get_current_user
+from app.routers.auth import get_current_user 
+
+
 """ from models.Person import Person
 from models.Token import Token
 from models.FilteredEmployee import FilteredEmployee
@@ -38,6 +42,7 @@ router = APIRouter()
 
 #Mount Static Files for File Storage
 router.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+print(os.getenv("MONGODB_URI"))
 
 """
 Application ENDPOINTS
@@ -224,7 +229,7 @@ async def create_employee(
         visa (UploadFile): The visa of the employee.
         unilav (UploadFile): The unilav of the employee.
         employees_dal (EmployeesDAL): The employees DAL.
-
+zzz
     Returns:  
         dict: A dictionary containing a message indicating the success or failure of the operation.
     """

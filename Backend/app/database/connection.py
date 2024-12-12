@@ -10,9 +10,8 @@ class Database:
         """
         Enables Connection to Mongo DataBase in LocalHost
         Gets connection strings via Enviroment variables.
-
         """
-        self.client = AsyncIOMotorClient(os.getenv("MONGODB_URI","mongodb://mongo:27017"))
+        self.client = AsyncIOMotorClient(os.getenv("MONGODB_URI"))
         self.db = self.client.application
         print("Connection to DB succesfull.")
 
