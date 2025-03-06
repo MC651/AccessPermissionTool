@@ -42,7 +42,7 @@ RUN mkdir -p /app/uploads
 
 # Copiar la aplicación y el archivo .env
 COPY app/ /app/app/
-COPY .env /app/.env
+
 
 # Exponer el puerto
 EXPOSE 8000
