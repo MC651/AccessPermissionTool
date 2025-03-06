@@ -16,7 +16,7 @@ export const UserInfo = <T extends unknown>():[boolean, T | null] => {
         return;
       }
       try {
-        const response = await axios.get('http://localhost:8000/my_info/', {
+        const response = await axios.get('process.env./my_info/', {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

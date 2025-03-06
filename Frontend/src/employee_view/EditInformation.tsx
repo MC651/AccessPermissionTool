@@ -111,7 +111,7 @@ const EditInformation: React.FC = () => {
 
     try { 
       const response = await axios.patch(
-        `http://localhost:8000/update/${employee?.fiscal_code}`,
+        `process.env./${employee?.fiscal_code}`,
         formData,
         {
           headers: {
