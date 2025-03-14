@@ -14,7 +14,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
     { field: 'id', headerName: 'ID', width: 100 },
     {
       field: 'first_name', headerName: 'Employee', width: 100,
-      valueGetter: (value, row) => {
+      valueGetter: (_value, row) => {
         return `${row.first_name} ${row.last_name}`
       }
     },
@@ -52,7 +52,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
       headerName: 'PO Validity End Date',
       width: 100,
       editable: true,
-      valueGetter: (value, row) => {
+      valueGetter: (_value, row) => {
         const new_date = row.purchase_order_validity_end_date;
         return `${new Date(new_date).toISOString().split("T")[0]}`
       }
@@ -70,7 +70,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
       headerName: 'Requester',
       width: 150,
       editable: true,
-      valueGetter: (value, row) => {
+      valueGetter: (_value, row) => {
         return `${row.requester_first_name} ${row.requester_last_name}`
       }
     },
@@ -78,7 +78,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
       field: 'locations',
       headerName: 'Locations',
       width: 100,
-      valueGetter: (value, row) => {
+      valueGetter: (_value, row) => {
         return `${row.locations}`
       }
     },
@@ -86,7 +86,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
       field: 'subapalto_number',
       headerName: 'Subapalto Number',
       width: 150,
-      valueGetter: (value, row) => {
+      valueGetter: (_value, row) => {
         return `${row.subapalto_number}`
       }
     },
@@ -106,7 +106,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
       headerName: 'Protocol Number',
       width: 150,
       editable: true,
-      valueGetter: (value, row) => {
+      valueGetter: (_value, row) => {
         return `${row.protocol_number}`
       }
     },
@@ -115,7 +115,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
       headerName: 'Plant',
       width: 150,
       editable: true,
-      valueGetter: (value, row) => {
+      valueGetter: (_value, row) => {
         
         return `${row.plant}`
       }
@@ -137,7 +137,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
       headerName: "Access Permission Validity End Date",
       width: 100,
       editable: true,
-      valueGetter: (value, row) => {
+      valueGetter: (_value, row) => {
         const new_date = row.access_permission_validity_end_date;
         return `${new Date(new_date).toISOString().split("T")[0]}`
       }
@@ -147,7 +147,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
       headerName: 'Address',
       width: 100,
       editable: true,
-      valueGetter: (value, row) => {
+      valueGetter: (_value, row) => {
         return `${row.address}`
       }
     },
@@ -156,7 +156,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
       headerName: 'Gates',
       width: 100,
       editable: true,
-      valueGetter: (value, row) => {
+      valueGetter: (_value, row) => {
         return `${row.gates}`
       }
     },

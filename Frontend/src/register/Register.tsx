@@ -11,7 +11,7 @@ import FileUploadField from "../register/FileInput"
 const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, marginTop,marginRight,maxWidth,marginLeft }) => {
   const [isUserCreated, setIsUserCreated] = useState(false);
   const [loading, isLoading] = useState(false);
-  const { register, handleSubmit, formState: { errors }, watch, reset, control, setValue } = useForm<Employee>();
+  const { register, handleSubmit, formState: { errors }, watch, control, setValue } = useForm<Employee>();
   const { openSnackbar, snackBarMessage, snackbarSeverity, showSnackbar, handleCloseSnackbar } = useSnackbar();
 
   const contractStartDate = watch("contract_validity_start_date");
@@ -30,25 +30,25 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
     formData.append("first_name", data.first_name);
     formData.append("last_name", data.last_name);
     formData.append("fiscal_code", data.fiscal_code);
-    formData.append("birth_date", data.birth_date);
-    formData.append("id_card_end_date", data.id_card_end_date);
+    formData.append("birth_date", data.birth_date instanceof Date ? data.birth_date.toISOString() : data.birth_date);
+    formData.append("id_card_end_date", data.id_card_end_date instanceof Date ? data.id_card_end_date.toISOString() : data.id_card_end_date);
     formData.append("contract_type", data.contract_type);
-    formData.append("contract_validity_start_date", data.contract_validity_start_date);
-    formData.append("contract_validity_end_date", data.contract_validity_end_date);
-    formData.append("visa_start_date", data.visa_start_date);
-    formData.append("visa_end_date", data.visa_end_date);
+    formData.append("contract_validity_start_date", data.contract_validity_start_date instanceof Date ? data.contract_validity_start_date.toISOString() : data.contract_validity_start_date);
+    formData.append("contract_validity_end_date", data.contract_validity_end_date instanceof Date ? data.contract_validity_end_date.toISOString() : data.contract_validity_end_date);
+    formData.append("visa_start_date", data.visa_start_date instanceof Date ? data.visa_start_date.toISOString() : data.visa_start_date);
+    formData.append("visa_end_date", data.visa_end_date instanceof Date ? data.visa_end_date.toISOString() : data.visa_end_date);
     formData.append("password", data?.user_credentials?.password);
     formData.append("email", data.user_credentials.email);
     formData.append("user_name", data.user_credentials.user_name);
-    formData.append("profile_image", data.profile_image);
-    formData.append("id_card", data.id_card);
-    formData.append("visa", data.visa);
-    formData.append("unilav", data.unilav);
+    formData.append("profile_image", data.profile_image || new File([], "default.png"));
+    formData.append("id_card", data.id_card || new File([], "default.png"));
+    formData.append("visa", data.visa || new File([], "default.pdf"));
+    formData.append("unilav", data.unilav || new File([], "default.pdf"));
 
     console.log(formData)
 
     try {
-      const response = await axios.post("process.env./create/",
+      const response = await axios.post("http://localhost:8000/create/",
         formData,
         {
           headers: {

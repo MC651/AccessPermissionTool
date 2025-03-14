@@ -11,7 +11,7 @@ const useAdminDashboard = () => {
         const fetchAllUsers = async () => {
             setLoading(true);
             try {
-                const response = await axios.get('process.env./all');
+                const response = await axios.get('http://localhost:8000/all');
                 setUserInfo(response.data);
                 //console.log(response.data);
                 setLoading(false);

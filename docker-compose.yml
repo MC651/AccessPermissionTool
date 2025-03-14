@@ -45,9 +45,9 @@ services:
       - backend
     volumes:
       - ./Frontend:/app
-      - node_modules:/app/node_modules # Evita el problema de node_modules
-
+      - node_modules:/app/node_modules # Volume for node_modules problem solved
+      
 volumes:
   mongo-data:
     driver: local
-  node_modules: # Agrego volumen nombrado para node_modules del frontend
+  node_modules: # Volume for node_modules problem persistance

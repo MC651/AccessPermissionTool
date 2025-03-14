@@ -17,7 +17,7 @@ const Login: React.FC = () => {
       password: data.password,
     };
     try {
-      const response = await axios.post(`process.env./login`, 
+      const response = await axios.post(`http://localhost:8000/login`, 
         formBody, 
         {
         headers: {

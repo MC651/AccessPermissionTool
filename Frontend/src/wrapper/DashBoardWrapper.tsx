@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createTheme } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
@@ -6,7 +7,6 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from './useDemoRouter';
 import { DashboardWrapperProps } from '../types';
 import ToolBarImage from './ToolBarImage';
-
 
 const userType = localStorage.getItem("user_type")
 
@@ -68,6 +68,7 @@ function DashboardWrapper({ children }: DashboardWrapperProps) {
     return (
         <AppProvider 
         navigation={NAVIGATION} 
+        
         router={router} 
         theme={demoTheme} 
         branding={{

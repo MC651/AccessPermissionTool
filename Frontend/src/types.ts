@@ -1,13 +1,12 @@
 import { AlertColor } from '@mui/material/Alert';
 import { SubmitHandler } from 'react-hook-form';
-import {  UseFormSetValue, UseFormWatch, Control } from "react-hook-form";
+import { UseFormSetValue, UseFormWatch, Control } from "react-hook-form";
 import { Breakpoint } from '@mui/material';
-
-export interface LoginFormInputs {
+/* import {z} from 'zod'; */
+export interface LoginFormInputss {
     username: string;
     password: string;
 }
-  
 export interface Employee {
     first_name: string;
     last_name: string;
@@ -31,37 +30,39 @@ export interface Employee {
     unilav_path?:string;
 }
 
+export interface AccesPermission{
+  protocol_number?:string;
+  plant?:string;
+  status?:string;
+  validity_end_date:Date | string; 
+  address?:string;
+  gates?: number[];
+}
+export interface  PurchaseOrder {
+  po_number?:string;
+  description?: string;
+  issue_date?:Date | string;
+  validity_end_date?:Date | string;
+  duvri?:boolean;
+  requester?:Requester;
+  locations?: string[];
+  access_permission?:AccesPermission[];
+  subapalto?:Subapalto;
+}
+
+
 export interface Requester{
     first_name?:string;
     last_name?:string;
     email?:string;
   }
   
-  export interface AccesPermission{
-    protocol_number?:string;
-    plant?:string;
-    status?:string;
-    validity_end_date:Date | string; 
-    address?:string;
-    gates?: number[];
-  }
 
   export interface Subapalto{
     subapalto_number?:string;
     subapalto_status?:string;
   }
   
-  export interface  PurchaseOrder {
-    po_number?:string;
-    description?: string;
-    issue_date?:Date | string;
-    validity_end_date?:Date | string;
-    duvri?:boolean;
-    requester?:Requester;
-    locations?: string[];
-    access_permission?:AccesPermission[];
-    subapalto?:Subapalto;
-  }
 
   export interface SinglePurchaseOrder {
     po_number?:string;
@@ -170,32 +171,32 @@ export interface RegisterProps {
     marginTop?: number;
     marginLeft?:number;
   }
-export interface Row {
-    fiscal_code?:string,
-    first_name?:string,
-    last_name?:string,
-    contract_validity_start_date?:string|Date,
-    contract_validity_end_date?:string|Date,
-    po_number?:string,
-    description?:string,
-    issue_date:string | Date,
-    purchase_order_validity_end_date:string |Date,
-    duvri?:boolean,
-    locations?:string[],
-    requester_first_name?:string,
-    requester_last_name?:string,
-    requester_email?:string,
-    protocol_number?:string,
-    plant?:string, 
-    status?:string,
-    access_permission_validity_end_date:string | Date,
-    address?:string,
-    gates?:number[],
-    subapalto_number?:string,
-    subapalto_status?:string,
-    id?:number
-
-}
+  export interface Row {
+    fiscal_code?: string | undefined;
+    first_name?: string | undefined;
+    last_name?: string | undefined;
+    contract_validity_start_date?: string | Date | undefined;
+    contract_validity_end_date?: string | Date | undefined;
+    po_number?: string | undefined;
+    description?: string | undefined;
+    issue_date: string | Date;
+    purchase_order_validity_end_date: string | Date;
+    duvri?: boolean | undefined;
+    locations?: string[] | undefined;
+    requester_first_name?: string | undefined;
+    requester_last_name?: string | undefined;
+    requester_email?: string | undefined;
+    protocol_number?: string | undefined;
+    plant?: string | undefined;
+    status?: string | undefined;
+    access_permission_validity_end_date: string | Date;
+    address?: string | undefined;
+    gates?: number[] | undefined;
+    subapalto_number?: string | undefined;
+    subapalto_status?: string | undefined;
+    id?: number | undefined;
+  }
+  
 export interface EditTableProps { 
   open: boolean;
   handleCloseEditTable: () => void;

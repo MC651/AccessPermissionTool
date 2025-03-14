@@ -10,6 +10,7 @@ import EditPurchaseOrder from './EditPurchaseOrder.tsx';
 import DeleteUser from './DeleteUser.tsx';
 import DeletePurchaseOrder from './DeletePurchaseOrder.tsx'; 
 import { createColumns } from './AdminDashboardColumns.tsx';
+import { AccesPermission } from '../types';
 
 
 
@@ -47,12 +48,12 @@ const flatEmployees = all_employees?.flatMap(employee =>
       requester_first_name: order.requester?.first_name || "",
       requester_last_name: order.requester?.last_name || "",
       requester_email: order.requester?.email || "",
-      protocol_number: permission.protocol_number || "",
-      plant: permission.plant || "",
-      status: permission.status || "",
-      access_permission_validity_end_date: permission.validity_end_date || new Date("1970-01-01"),
-      address: permission.address || "",
-      gates: permission.gates || "",
+      protocol_number: (permission as AccesPermission).protocol_number || "",
+      plant: (permission as AccesPermission).plant || "",
+      status: (permission as AccesPermission).status || "",
+      access_permission_validity_end_date: (permission as AccesPermission).validity_end_date || new Date("1970-01-01"),
+      address: (permission as AccesPermission).address || "",
+      gates: (permission as AccesPermission).gates || "",
       subapalto_number: order.subapalto?.subapalto_number || "",
       subapalto_status: order.subapalto?.subapalto_status || ""
     }))

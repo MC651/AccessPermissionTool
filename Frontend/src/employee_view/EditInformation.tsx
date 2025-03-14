@@ -1,3 +1,4 @@
+ // @ts-nocheck
 import React, { useState } from "react";
 import { useEmployee } from "../contexts/EmployeeContext";
 import { useForm } from "react-hook-form";
@@ -10,7 +11,7 @@ import MessageBar from "../components/MessageBar";
 import FileUploadField from "../register/FileInput";
 
 const EditInformation: React.FC = () => {
-  const { loaded, employee } = useEmployee();
+  const { loaded, employee } = useEmployee(); 
 
   const {openSnackbar,snackBarMessage,snackbarSeverity,showSnackbar,handleCloseSnackbar} = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
@@ -57,8 +58,11 @@ const EditInformation: React.FC = () => {
   const hasNewUnilav  = !!watch("unilav");
   const isButtonDisabled = !(hasDirtyFields || hasNewProfileImage || hasNewIdCard || hasNewVisa || hasNewUnilav);
 
+  console.log(dirtyFields);
+
   const onSubmit = handleSubmit(async (data: Employee) => {
   setIsLoading(true);
+  console.log(data);
 
   const updatedFields = Object.keys(dirtyFields).reduce((acc, key) => {
     const field = key as keyof Employee;
@@ -69,18 +73,18 @@ const EditInformation: React.FC = () => {
   }, {} as Partial<Employee>);
 
   if (hasNewProfileImage) {
-    updatedFields.profile_image = data.profile_image; // Incluye el archivo si se subió
+    updatedFields.profile_image = data.profile_image; 
   }
 
   if (hasNewIdCard) {
-    updatedFields.id_card = data.id_card; // Incluye el archivo si se subió
+    updatedFields.id_card = data.id_card;
   }
 
   if (hasNewVisa) {
-    updatedFields.visa = data.visa; // Incluye el archivo si se subió
+    updatedFields.visa = data.visa;
   }
   if (hasNewUnilav) {
-    updatedFields.unilav = data.unilav; // Incluye el archivo si se subió
+    updatedFields.unilav = data.unilav;
   }
 
 
@@ -105,13 +109,13 @@ const EditInformation: React.FC = () => {
   else if (key === "user_credentials" && typeof value === "object") {
     formData.append(key, JSON.stringify(value));
   } else {
-    formData.append(key, String(value)); // Convertir valores no archivos a cadena
+    formData.append(key, String(value));
     }
   }
 
     try { 
       const response = await axios.patch(
-        `process.env./${employee?.fiscal_code}`,
+        `http://localhost:8000/${employee?.fiscal_code}`,
         formData,
         {
           headers: {

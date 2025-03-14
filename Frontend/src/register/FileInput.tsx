@@ -24,7 +24,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
     <Box sx={{ display: "flex", alignItems: "center", marginTop: 2, gap: 2 }}>
       {isEdit && (
        <a
-       href={`process.env./${fiscalCode}/${name}.${fileExtension}`}
+       href={`http://localhost:8000/${fiscalCode}/${name}.${fileExtension}`}
        download 
        >
        <Button
@@ -70,7 +70,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
               size="small"
               sx={{ flex: 3 }}
               variant="outlined"
-              value={watch(name)?.name || ""}
+              value={(watch(name) as { name?: string })?.name || ""}
               placeholder="No file selected"
               disabled
             />
