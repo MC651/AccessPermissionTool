@@ -6,11 +6,11 @@ import os
 #Load environment variables
 load_dotenv()
 
-""" from app.routers import routes
-from app.database.connection import database """
+from app.routers import routes
+from app.database.connection import database
 
-from routers import routes
-from database.connection import database
+""" from routers import routes
+from database.connection import database """
 
 # Application instance which creates the server
 app = FastAPI()
