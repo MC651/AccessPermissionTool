@@ -38,7 +38,7 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
     console.log(formattedData);
     try {
       const response = await axios.patch(
-        `http://localhost:8000/create_purchase_order/`,
+        `${import.meta.env.VITE_API_URL}/create_purchase_order/`,
         formattedData,
         {
           headers: {

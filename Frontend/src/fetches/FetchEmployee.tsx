@@ -16,7 +16,7 @@ export const UserInfo = <T,>():[boolean, T | null] => {
         return;
       }
       try {
-        const response = await axios.get('http://localhost:8000/my_info/', {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/my_info/`, {
           headers: {
             Authorization: `Bearer ${token}`, 
             'Content-Type': 'application/json',

@@ -10,25 +10,28 @@ const Login: React.FC = () => {
   const {openSnackbar,snackBarMessage,snackbarSeverity,showSnackbar,handleCloseSnackbar} = useSnackbar();
   const {register,handleSubmit,formState: { errors },} = useForm<LoginFormInputs>();
   const navigate = useNavigate();
+  
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
+
     const formBody = {
       username: data.username,
       password: data.password,
-    };
+    };  
     try {
-      const response = await axios.post(`http://localhost:8000/login`, 
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, 
         formBody, 
         {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       }
-    );
+    ); 
       localStorage.setItem("access_token", response.data["access_token"]);
       localStorage.setItem("user_type", response.data["ut"]);
       //localStorage.setItem("user_name", response.data["us"]);
       localStorage.setItem("fiscal_code", response.data["fs"]);
+      console.log(response);
       showSnackbar(response.data.message || "Login Successful", "success",true);
       console.log(response);
       setTimeout(() => {

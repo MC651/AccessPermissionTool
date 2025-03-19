@@ -45,9 +45,9 @@ services:
       - backend
     volumes:
       - ./Frontend:/app
-      - node_modules:/app/node_modules # Volume for node_modules problem solved
+      - node_modules:/app/node_modules
       
 volumes:
   mongo-data:
     driver: local
-  node_modules: # Volume for node_modules problem persistance
+  node_modules:

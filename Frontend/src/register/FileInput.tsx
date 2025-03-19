@@ -24,7 +24,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
     <Box sx={{ display: "flex", alignItems: "center", marginTop: 2, gap: 2 }}>
       {isEdit && (
        <a
-       href={`http://localhost:8000/${fiscalCode}/${name}.${fileExtension}`}
+       href={`${import.meta.env.VITE_API_URL}/download/${fiscalCode}/${name}.${fileExtension}`}
        download 
        >
        <Button

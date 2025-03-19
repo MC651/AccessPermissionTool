@@ -52,7 +52,7 @@ const EditAccessPermission: React.FC<EditTableProps> = ({ open, handleCloseEditT
     try {
       //console.log(formattedData);
       const response = await axios.patch(
-        `http://localhost:8000/update_access_permission/${row?.po_number}/${row?.protocol_number}`,
+        `${import.meta.env.VITE_API_URL}/update_access_permission/${row?.po_number}/${row?.protocol_number}`,
         formattedData,
         {
           headers : {

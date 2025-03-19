@@ -16,7 +16,7 @@ const DeletePurchaseOrder: React.FC<DeletePurchaseOrderProps> = ({ open, handleC
         setIsLoading(true);
         try {
             const response = await axios.delete(
-                `http://localhost:8000/${po_number}`
+                `${import.meta.env.VITE_API_URL}/${po_number}`
             );
 
             showSnackbar(response.data.message,"success",true)

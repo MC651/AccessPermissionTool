@@ -11,7 +11,7 @@ const useAdminDashboard = () => {
         const fetchAllUsers = async () => {
             setLoading(true);
             try {
-                const response = await axios.get('http://localhost:8000/all');
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/all`);
                 setUserInfo(response.data);
                 //console.log(response.data);
                 setLoading(false);

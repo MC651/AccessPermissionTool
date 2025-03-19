@@ -128,7 +128,7 @@ const EditPurchaseOrder: React.FC<EditPurchaseOrderProps> = ({ open, handleClose
         try {
             console.log(updatedFields);
             const response = await axios.patch(
-              `http://localhost:8000/update_purchase_order/${row?.po_number}`,
+              `${import.meta.env.VITE_API_URL}/update_purchase_order/${row?.po_number}`,
               transformedData,
               {
                 headers : {

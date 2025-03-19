@@ -17,7 +17,7 @@ const DeleteUser: React.FC<DeleteUserProps> = ({ open, handleCloseDeleteUser, ro
         setIsLoading(true);
         try {
             const response = await axios.delete(
-                `http://localhost:8000/${fiscal_code}`
+                `${import.meta.env.VITE_API_URL}/delete/${fiscal_code}`
             );
             
             showSnackbar(response.data.message,"success",true)

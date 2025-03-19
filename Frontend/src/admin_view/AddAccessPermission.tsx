@@ -34,7 +34,7 @@ const AddAccessPermission: React.FC<AccessPermisionDialogComponentProps> = ({ op
         //console.log(data);
         try {
             const response = await axios.patch(
-                `http://localhost:8000/insert_access_permission/${fiscalCode}`,
+                `${import.meta.env.VITE_API_URL}/insert_access_permission/${fiscalCode}`,
                 data,
                 {
                     headers : {

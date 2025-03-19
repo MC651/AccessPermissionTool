@@ -8,6 +8,7 @@ import { useSnackbar } from "../hooks/useSnackbar";
 import MessageBar from "../components/MessageBar";
 import FileUploadField from "../register/FileInput"
 
+
 const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, marginTop,marginRight,maxWidth,marginLeft }) => {
   const [isUserCreated, setIsUserCreated] = useState(false);
   const [loading, isLoading] = useState(false);
@@ -46,9 +47,10 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
     formData.append("unilav", data.unilav || new File([], "default.pdf"));
 
     console.log(formData)
-
     try {
-      const response = await axios.post("http://localhost:8000/create/",
+      
+      
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/create/`,
         formData,
         {
           headers: {
@@ -57,7 +59,7 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
         }
       );
       showSnackbar(response.data.message, "success", true);
-      //console.log(response);
+      console.log(response);
       setIsUserCreated(true);
       isLoading(false);
       //reset();

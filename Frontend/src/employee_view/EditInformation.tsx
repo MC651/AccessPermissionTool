@@ -115,7 +115,7 @@ const EditInformation: React.FC = () => {
 
     try { 
       const response = await axios.patch(
-        `http://localhost:8000/${employee?.fiscal_code}`,
+        `${import.meta.env.VITE_API_URL}/update/${employee?.fiscal_code}`,
         formData,
         {
           headers: {
