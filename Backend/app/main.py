@@ -1,10 +1,16 @@
 from fastapi import FastAPI,HTTPException
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import routes
-from app.database.connection import database
-""" from routers import routes
-from database.connection import database """
+from dotenv import load_dotenv
+import os
+#Load environment variables
+load_dotenv()
+
+""" from app.routers import routes
+from app.database.connection import database """
+
+from routers import routes
+from database.connection import database
 
 # Application instance which creates the server
 app = FastAPI()
@@ -13,6 +19,9 @@ app = FastAPI()
 origins = [
     "http://localhost:5173",
     "http://localhost:5172",
+    "https://accesspermissiontool-frontend.onrender.com/"
+    
+
 ]
 
 # Assigment of the routers to the main app & the lifespan
