@@ -19,7 +19,8 @@ app = FastAPI()
 origins = [
     "http://localhost:5173",
     "http://localhost:5172",
-    "https://accesspermissiontool-frontend.onrender.com"
+    "https://accesspermissiontool-frontend.onrender.com",
+    "https://access-permission-tool.vercel.app"
 ]
 
 # Assigment of the routers to the main app & the lifespan
