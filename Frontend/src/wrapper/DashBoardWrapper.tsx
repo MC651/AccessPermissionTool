@@ -72,7 +72,7 @@ function DashboardWrapper({ children }: DashboardWrapperProps) {
         router={router} 
         theme={demoTheme} 
         branding={{
-            logo: <img src="public\images\logo_corporate.png" alt="logo" />,
+            logo: <img src="images\logo_corporate.png" alt="logo" />,
             title: '',
         }}
         >
