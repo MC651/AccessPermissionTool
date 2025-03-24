@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import EmailStr
 
 
-from app.models.Person import Person
+""" from app.models.Person import Person
 from app.models.Token import Token
 from app.models.FilteredEmployee import FilteredEmployee
 from app.models.PurchaseOrder import PurchaseOrder
@@ -16,10 +16,10 @@ from app.dal.employees_dal import EmployeesDAL
 from app.database.dependencies import get_employees_dal
 from app.routers.auth import create_access_token
 from app.routers.utils import format_path,save_files
-from app.routers.auth import get_current_user 
+from app.routers.auth import get_current_user  """
 
 
-""" from models.Person import Person
+from models.Person import Person
 from models.Token import Token
 from models.FilteredEmployee import FilteredEmployee
 from models.PurchaseOrder import PurchaseOrder
@@ -28,7 +28,7 @@ from dal.employees_dal import EmployeesDAL
 from database.dependencies import get_employees_dal
 from routers.auth import create_access_token
 from routers.utils import format_path,save_files
-from routers.auth import get_current_user """
+from routers.auth import get_current_user
 
 from typing import Annotated, Any, Dict, Optional
 from datetime import datetime,timedelta
@@ -42,7 +42,6 @@ router = APIRouter()
 
 #Mount Static Files for File Storage
 router.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
-print(os.getenv("MONGODB_URI"))
 
 """
 Application ENDPOINTS
@@ -177,7 +176,7 @@ async def login_for_access_token(response: Response,form_data: Annotated[OAuth2P
                                              "ut":user["user_credentials"]["user_type"],
                                              "fs":user["fiscal_code"]}, 
                                              expires_delta=access_token_expires)
-    
+    print(user)
     return Token(access_token=access_token, token_type="bearer",
                  us=user["user_credentials"]["user_name"],
                  fs=user["fiscal_code"],
@@ -195,14 +194,14 @@ async def create_employee(
     contract_type: str = Form(...),
     contract_validity_start_date: datetime = Form(...), 
     contract_validity_end_date: datetime = Form(...), 
-    visa_start_date: datetime = Form(...),  
-    visa_end_date: datetime = Form(...),
+    visa_start_date: Optional[datetime] = Form(None),  
+    visa_end_date: Optional[datetime] = Form(None),
     email: EmailStr = Form(...),
     password: str = Form(...),
     purchase_order: Optional[list] = Form(default=[]),  
     profile_image: UploadFile = File(...),
     id_card: UploadFile = File(...),
-    visa: UploadFile = File(...),
+    visa: Optional[UploadFile] = File(None),
     unilav: UploadFile = File(...),
     employees_dal: EmployeesDAL = Depends(get_employees_dal)
 ):      
@@ -233,15 +232,18 @@ zzz
     Returns:  
         dict: A dictionary containing a message indicating the success or failure of the operation.
     """
-    
     root = os.path.join(os.getenv("UPLOAD_DIR"),fiscal_code)
     os.makedirs(root,exist_ok=True)
 
-    files_to_save = [profile_image, id_card, visa, unilav]
-    file_names = ["profile_image", "id_card", "visa", "unilav"]
+    files_to_save = [profile_image, id_card, unilav]
+    file_names = ["profile_image", "id_card", "unilav"]
+    if visa:
+        files_to_save.append(visa)
+        file_names.append("visa")
+
         
     saved_file_paths = await save_files(file_names=file_names, root_dir=root,files=files_to_save)
-        
+    
     #First Process images, save them and return the path
     employee = await employees_dal.create_employee(
             first_name= first_name,
@@ -260,8 +262,8 @@ zzz
             purchase_order= purchase_order,
             profile_image_path= saved_file_paths[0],
             id_card_path= saved_file_paths[1],
-            visa_path= saved_file_paths[2],
-            unilav_path= saved_file_paths[3]
+            unilav_path= saved_file_paths[2],
+            visa_path= saved_file_paths[3] if len(saved_file_paths) > 3 else None
             ) 
                 
     return {"message" : f"Employee {first_name} {last_name} created successfully"}

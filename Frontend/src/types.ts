@@ -1,5 +1,5 @@
 import { AlertColor } from '@mui/material/Alert';
-import { SubmitHandler } from 'react-hook-form';
+import { SubmitHandler,FieldErrors } from 'react-hook-form';
 import { UseFormSetValue, UseFormWatch, Control } from "react-hook-form";
 import { Breakpoint } from '@mui/material';
 /* import {z} from 'zod'; */
@@ -277,6 +277,7 @@ export interface FileUploadFieldProps {
   rules?: object; // Opcional: Validaciones como required
   fiscalCode?:string;
   fileExtension?:string;
+  errors?:FieldErrors<Employee>;
 }
 
 export interface AdminColumnsProps {

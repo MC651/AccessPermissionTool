@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Employee, FastAPIError, RegisterProps } from "../types";
 import { Box, Button, FormControl, FormLabel, TextField, MenuItem, Select, Typography, Container, Paper, Divider, CircularProgress } from "@mui/material";
@@ -12,9 +12,9 @@ import FileUploadField from "../register/FileInput"
 const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, marginTop,marginRight,maxWidth,marginLeft }) => {
   const [isUserCreated, setIsUserCreated] = useState(false);
   const [loading, isLoading] = useState(false);
-  const { register, handleSubmit, formState: { errors }, watch, control, setValue } = useForm<Employee>();
+  const { register, handleSubmit, formState: { errors }, watch, control,reset, setValue } = useForm<Employee>();
   const { openSnackbar, snackBarMessage, snackbarSeverity, showSnackbar, handleCloseSnackbar } = useSnackbar();
-
+  const navigate = useNavigate();
   const contractStartDate = watch("contract_validity_start_date");
   const visaStartDate = watch("visa_start_date");
 
@@ -25,6 +25,7 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
     const transformData = {
       ...data,
       purchase_order: []
+      
     };
     console.log(transformData);
     const formData = new FormData();
@@ -36,20 +37,25 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
     formData.append("contract_type", data.contract_type);
     formData.append("contract_validity_start_date", data.contract_validity_start_date instanceof Date ? data.contract_validity_start_date.toISOString() : data.contract_validity_start_date);
     formData.append("contract_validity_end_date", data.contract_validity_end_date instanceof Date ? data.contract_validity_end_date.toISOString() : data.contract_validity_end_date);
-    formData.append("visa_start_date", data.visa_start_date instanceof Date ? data.visa_start_date.toISOString() : data.visa_start_date);
-    formData.append("visa_end_date", data.visa_end_date instanceof Date ? data.visa_end_date.toISOString() : data.visa_end_date);
+    if(data.visa_start_date){
+      formData.append("visa_start_date", data.visa_start_date instanceof Date ? data.visa_start_date.toISOString() : data.visa_start_date);
+    }
+    if(data.visa_end_date){
+      formData.append("visa_end_date", data.visa_end_date instanceof Date ? data.visa_end_date.toISOString() : data.visa_end_date);
+    }
     formData.append("password", data?.user_credentials?.password);
     formData.append("email", data.user_credentials.email);
     formData.append("user_name", data.user_credentials.user_name);
     formData.append("profile_image", data.profile_image || new File([], "default.png"));
     formData.append("id_card", data.id_card || new File([], "default.png"));
-    formData.append("visa", data.visa || new File([], "default.pdf"));
+    if(data.visa){
+      formData.append("visa", data.visa || new File([], "default.pdf"));
+    }
     formData.append("unilav", data.unilav || new File([], "default.pdf"));
 
-    console.log(formData)
+    console.log(formData);
+    
     try {
-      
-      
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/create/`,
         formData,
         {
@@ -59,10 +65,13 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
         }
       );
       showSnackbar(response.data.message, "success", true);
-      console.log(response);
+      //console.log(response);
       setIsUserCreated(true);
       isLoading(false);
-      //reset();
+      reset();
+      setTimeout(() => {
+        navigate("/login")
+      }, 2300);
     } catch (error) {
       showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error creating user", "error", true);
       isLoading(false);
@@ -208,12 +217,8 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
                   size="small"
                   type="date"
                   {...register("contract_validity_start_date", {
-                    required: "Contract validity start date is required",
-                    validate: (value) => {
-                      const startDate = new Date(value);
-                      const today = new Date();
-                      return startDate > today || "Contract validity start date must be greater than today";
-                    },
+                    required: "Contract validity start date is required"
+    
                   })}
                   error={!!errors.contract_validity_start_date}
                   helperText={errors.contract_validity_start_date?.message}
@@ -231,8 +236,8 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
                   {...register("contract_validity_end_date", {
                     required: "Contract validity end date is required",
                     validate: (value) => {
-                      const startDate = new Date(contractStartDate);
                       const endDate = new Date(value);
+                      const startDate = new Date(contractStartDate);
                       return endDate > startDate || "End date must be greater than the start date";
                     },
                   })}
@@ -266,8 +271,7 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
 
 
 
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              {/* Visa Start Date */}
+           {/* <Box sx={{ display: 'flex', gap: 2 }}>
               <FormControl fullWidth margin="normal">
                 <FormLabel>Visa Start Date:</FormLabel>
                 <TextField
@@ -282,8 +286,6 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
                   variant="outlined"
                 />
               </FormControl>
-
-              {/* Visa End Date */}
               <FormControl fullWidth margin="normal">
                 <FormLabel>Visa End Date:</FormLabel>
                 <TextField
@@ -303,54 +305,120 @@ const Register: React.FC<RegisterProps> = ({ elevation_level, isRegister, margin
                   variant="outlined"
                 />
               </FormControl>
-            </Box>
-            <Typography variant="h6" gutterBottom textAlign={"center"}>Files</Typography>
-  
+            </Box> */}
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            {/* Visa Start Date */}
+            <FormControl fullWidth margin="normal">
+              <FormLabel>Visa Start Date:</FormLabel>
+              <TextField
+                size="small"
+                type="date"
+                {...register("visa_start_date")} // No required validation
+                error={!!errors.visa_start_date}
+                helperText={errors.visa_start_date?.message}
+                fullWidth
+                variant="outlined"
+              />
+            </FormControl>
+
+            {/* Visa End Date */}
+            <FormControl fullWidth margin="normal">
+              <FormLabel>Visa End Date:</FormLabel>
+              <TextField
+                size="small"
+                type="date"
+                {...register("visa_end_date", {
+                  validate: (value) => {
+                    if (!value) return true; // Allow empty field (optional)
+                    const startDate = new Date(visaStartDate); // Get visa_start_date value
+                    const endDate = new Date(value);
+                    return endDate > startDate || "End date must be greater than the start date";
+                  },
+                })}
+                error={!!errors.visa_end_date}
+                helperText={errors.visa_end_date?.message}
+                fullWidth
+                variant="outlined"
+              />
+            </FormControl>
+          </Box>
+
+            <Typography variant="h6" gutterBottom textAlign={"center"}>Files</Typography>  
             <FileUploadField 
             name="profile_image"
             label="User Image"
             control={control}
-            rules={{ required: true }}
+            rules={{ 
+              validate: (value: File | null) => {
+                if (!value) {
+                  return "Profile Image is required"; // Show message only when file is missing
+                }
+                return true; // No error if a file is provided
+              },
+            }}
             accept="image/png"
             setValue={setValue}
             watch={watch}
-
-
+            errors={errors}
             />
 
             <FileUploadField
               name="id_card"
               label="ID Card"
               control={control}
-              rules={{ required: true }}
+              rules={{ 
+                validate: (value: File | null) => {
+                  if (!value) {
+                    return "ID Card  is required"; // Show message only when file is missing
+                  }
+                  return true; // No error if a file is provided
+                },
+              }}
               accept="image/png"
               setValue={setValue}
               watch={watch}
+              errors={errors}
               />
 
-            <FileUploadField
-              name="visa"
-              label="Visa"
-              control={control}
-              rules={{ required: true }}
-              accept="application/pdf"
-              setValue={setValue}
-              watch={watch}
+              <FileUploadField
+                name="visa"
+                label="Visa"
+                control={control}
+                rules={{
+                  validate: (value:File) => {
+                    const visaStartDate = watch("visa_start_date");
+                    const visaEndDate = watch("visa_end_date");
 
+                    // If a visa start or end date is entered, the PDF is required
+                    if ((visaStartDate || visaEndDate) && !value) {
+                      return "Visa is required when visa dates are provided.";
+                    }
+                    return true;
+                  },
+                }}
+                accept="application/pdf"
+                setValue={setValue}
+                watch={watch}
+                errors={errors}
               />
 
               <FileUploadField
                 name="unilav"
                 label="Unilav"
                 control={control}
-                rules={{ required: true }}
+                rules={{ 
+                  validate: (value: File | null) => {
+                    if (!value) {
+                      return "Unilav is required"; // Show message only when file is missing
+                    }
+                    return true; // No error if a file is provided
+                  },
+                }}
                 accept="application/pdf"
                 setValue={setValue}
                 watch={watch}
+                errors={errors}
                 />
-
-
-           
 
             {/* Email */}
             <FormControl fullWidth margin="normal">

@@ -50,7 +50,6 @@ const EditInformation: React.FC = () => {
   
   const contractStartDate = watch("contract_validity_start_date");
   const visaStartDate = watch("visa_start_date");
-  const idEndDate = watch("id_card_end_date");
   const hasDirtyFields = Object.keys(dirtyFields).length > 0;
   const hasNewProfileImage = !!watch("profile_image");
   const hasNewIdCard = !!watch("id_card");
@@ -59,6 +58,7 @@ const EditInformation: React.FC = () => {
   const isButtonDisabled = !(hasDirtyFields || hasNewProfileImage || hasNewIdCard || hasNewVisa || hasNewUnilav);
 
   console.log(dirtyFields);
+  
 
   const onSubmit = handleSubmit(async (data: Employee) => {
   setIsLoading(true);
@@ -244,12 +244,7 @@ const EditInformation: React.FC = () => {
                   type="date"
                   fullWidth
                   {...register("contract_validity_start_date", {
-                    validate: (value) => {
-                      const startDate = new Date(value);
-                      const visaStart = new Date(visaStartDate);
-                      const idStart = new Date(idEndDate);
-                      return (startDate > visaStart && startDate < idStart) || "Contract validity start date must be greater than Visa Start Date and Less than ID End Date";
-                    },
+                    required: "Contract validity start date is required"
                   })}
                   error={!!errors.contract_validity_start_date}
                   helperText={errors.contract_validity_start_date?.message}
@@ -283,13 +278,7 @@ const EditInformation: React.FC = () => {
                   size="small"
                   type="date"
                   fullWidth
-                  {...register("visa_start_date", {
-                    validate: (value) => {
-                      const startDate = new Date(value);
-                      const idEnd = new Date(idEndDate);
-                      return startDate < idEnd || "Visa Start Date must be lower than ID End";
-                    },
-                  })}
+                  {...register("visa_start_date")}
                   error={!!errors.visa_start_date}
                   helperText={errors.visa_start_date?.message}
                 />
@@ -303,7 +292,9 @@ const EditInformation: React.FC = () => {
                   fullWidth
                   {...register("visa_end_date", {
                     validate: (value) => {
-                      const startDate = new Date(visaStartDate);
+                      if (!visaStartDate) return true;
+                      if (!value) return "Visa End Date is required when Visa Start Date is set"; // Requerido si hay startDate 
+                      const startDate = new Date(visaStartDate); 
                       const endDate = new Date(value);
                       return endDate > startDate || "End date must be greater than the start date";
                     },
@@ -384,6 +375,17 @@ const EditInformation: React.FC = () => {
                 isEdit={true}
                 fiscalCode={employee?.fiscal_code} 
                 fileExtension="pdf"
+                errors={errors}
+                rules={{
+                  validate: (value:File) => {
+                    const visaStartDate = watch("visa_start_date");
+                    const visaEndDate = watch("visa_end_date");
+                    if ((visaStartDate || visaEndDate) && !value) {
+                      return "Visa is required when visa dates are provided.";
+                    }
+                    return true;
+                  },
+                }}
               />
             
             <FileUploadField

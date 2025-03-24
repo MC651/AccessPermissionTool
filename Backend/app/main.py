@@ -19,8 +19,7 @@ app = FastAPI()
 origins = [
     "http://localhost:5173",
     "http://localhost:5172",
-    "https://accesspermissiontool-frontend.onrender.com",
-    "https://access-permission-tool.vercel.app"
+    os.getenv("REACT_URL")
 ]
 
 # Assigment of the routers to the main app & the lifespan

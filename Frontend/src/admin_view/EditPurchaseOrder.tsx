@@ -46,7 +46,7 @@ const EditPurchaseOrder: React.FC<EditPurchaseOrderProps> = ({ open, handleClose
       console.log(allData);
       try {
        const response = await axios.patch(
-          `process.env./insert_purchase_order/${fiscal_code}`,
+          `${import.meta.env.VITE_API_URL}/insert_purchase_order/${fiscal_code}`,
           allData,
           {
             headers: {

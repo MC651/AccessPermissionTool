@@ -1,10 +1,11 @@
 import React, { useRef } from "react";
-import { Controller} from "react-hook-form";
+import { Controller,FieldErrors} from "react-hook-form";
 import { Box, Button, TextField, IconButton } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ClearIcon from "@mui/icons-material/Clear";
 import { FileUploadFieldProps } from "../types";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import { Employee } from "../types";
 
 const FileUploadField: React.FC<FileUploadFieldProps> = ({
   isEdit=false,
@@ -17,6 +18,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
   rules = {},
   fiscalCode,
   fileExtension,
+  errors = {} as FieldErrors<Employee>
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -71,8 +73,11 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
               sx={{ flex: 3 }}
               variant="outlined"
               value={(watch(name) as { name?: string })?.name || ""}
-              placeholder="No file selected"
+              placeholder=" No file selected "
               disabled
+              error={!!errors[name]}
+              helperText={errors[name]?.message}
+
             />
             {watch(name) && (
               <IconButton

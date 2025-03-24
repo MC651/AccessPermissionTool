@@ -20,14 +20,14 @@ class Person(BaseModel):
     contract_type:str
     contract_validity_start_date: datetime
     contract_validity_end_date: datetime
-    visa_start_date:datetime
-    visa_end_date:datetime
+    visa_start_date: Optional[datetime] | None = Field(default=None)
+    visa_end_date: Optional[datetime] | None = Field(default=None)
     user_credentials : UserCredentials
     #purchase_order: Optional[list[PurchaseOrder]] = Field(default_factory=  lambda: [PurchaseOrder()])
     purchase_order: Optional[list[PurchaseOrder]]
     profile_image_path: Optional[str] = None
     id_card_path: Optional[str] = None
-    visa_path: Optional[str] = None
+    visa_path: Optional[str] = Field(default=None)
     unilav_path: Optional[str] = None
     
     # Static methods are used to deserealize the mongoDB document into
