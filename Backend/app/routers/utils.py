@@ -9,7 +9,7 @@ from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.errors import HttpError
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
-SERVICE_ACCOUNT_FILE = "accesspermissionstorage-3b70e75ecae3.json"
+SERVICE_ACCOUNT_FILE = "/etc/secrets/accesspermissionstorage-3b70e75ecae3.json"
 
 def format_path(file_path: str) -> str:
     """
