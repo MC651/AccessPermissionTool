@@ -5,21 +5,21 @@ from passlib.context import CryptContext
 from pymongo.errors import DuplicateKeyError
 import json 
 
-""" from app.models.Person import Person
+from app.models.Person import Person
 from app.models.Token import Token
 from app.models.FilteredEmployee import FilteredEmployee
 from app.models.ModifiedEmployee import ModifiedEmployee
 from app.models.PurchaseOrder import PurchaseOrder
 from app.models.AccessPermission import AccessPermission
-from app.models.Person import UserCredentials """
+from app.models.Person import UserCredentials
 
-from models.Person import Person
+""" from models.Person import Person
 from models.Token import Token
 from models.FilteredEmployee import FilteredEmployee
 from models.ModifiedEmployee import ModifiedEmployee
 from models.PurchaseOrder import PurchaseOrder
 from models.AccessPermission import AccessPermission
-from models.Person import UserCredentials
+from models.Person import UserCredentials """
 
 #Password Context for hashing algorithm bcrypt
 pwd_context = CryptContext(schemes=["bcrypt"],deprecated="auto")

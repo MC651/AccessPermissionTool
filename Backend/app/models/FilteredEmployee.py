@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
-#from app.models.PurchaseOrder import PurchaseOrder
-from models.PurchaseOrder import PurchaseOrder
+from app.models.PurchaseOrder import PurchaseOrder
+#from models.PurchaseOrder import PurchaseOrder
 
 class FilteredEmployee(BaseModel):
     first_name:str

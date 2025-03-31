@@ -47,6 +47,7 @@ const EditInformation: React.FC = () => {
       unilav:null
     }
   });
+
   const hasPreviousVisa = !!employee?.visa_path;
   const contractStartDate = watch("contract_validity_start_date");
   const visaStartDate = watch("visa_start_date");
@@ -349,7 +350,6 @@ const EditInformation: React.FC = () => {
                 watch={watch}
                 isEdit={true}
                 fiscalCode={employee?.fiscal_code} 
-                fileExtension="png"
               />
 
                <FileUploadField
@@ -361,7 +361,6 @@ const EditInformation: React.FC = () => {
                 watch={watch}
                 isEdit={true}
                 fiscalCode={employee?.fiscal_code} 
-                fileExtension="png"
               />
 
                
@@ -374,7 +373,6 @@ const EditInformation: React.FC = () => {
                 watch={watch}
                 isEdit={true}
                 fiscalCode={employee?.fiscal_code} 
-                fileExtension="pdf"
                 errors={errors}
                 rules={{
                   validate: (value:File) => {
@@ -396,8 +394,7 @@ const EditInformation: React.FC = () => {
                 setValue={setValue}
                 watch={watch}
                 isEdit={true}
-                fiscalCode={employee?.fiscal_code} 
-                fileExtension="pdf"
+                fiscalCode={employee?.fiscal_code}
               /> 
               
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>

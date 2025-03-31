@@ -8,7 +8,7 @@ from pydantic import EmailStr
 import tempfile
 
 
-""" from app.models.Person import Person
+from app.models.Person import Person
 from app.models.Token import Token
 from app.models.FilteredEmployee import FilteredEmployee
 from app.models.PurchaseOrder import PurchaseOrder
@@ -16,11 +16,11 @@ from app.models.AccessPermission import AccessPermission
 from app.dal.employees_dal import EmployeesDAL
 from app.database.dependencies import get_employees_dal
 from app.routers.auth import create_access_token
-from app.routers.utils import format_path,save_files
-from app.routers.auth import get_current_user  """
+from routers.utils import format_path,save_and_rename_files,create_folder,upload_file_to_drive, download_file_drive,replace_file_in_folder,get_file
+from app.routers.auth import get_current_user 
 
 
-from models.Person import Person
+""" from models.Person import Person
 from models.Token import Token
 from models.FilteredEmployee import FilteredEmployee
 from models.PurchaseOrder import PurchaseOrder
@@ -29,7 +29,7 @@ from dal.employees_dal import EmployeesDAL
 from database.dependencies import get_employees_dal
 from routers.auth import create_access_token
 from routers.utils import format_path,save_and_rename_files,create_folder,upload_file_to_drive, download_file_drive,replace_file_in_folder,get_file
-from routers.auth import get_current_user
+from routers.auth import get_current_user """
 
 from typing import Annotated, Any, Dict, Optional
 from datetime import datetime,timedelta
@@ -195,7 +195,7 @@ async def login_for_access_token(response: Response,form_data: Annotated[OAuth2P
                                              "ut":user["user_credentials"]["user_type"],
                                              "fs":user["fiscal_code"]}, 
                                              expires_delta=access_token_expires)
-    #print(user)
+    
     return Token(access_token=access_token, token_type="bearer",
                  us=user["user_credentials"]["user_name"],
                  fs=user["fiscal_code"],
