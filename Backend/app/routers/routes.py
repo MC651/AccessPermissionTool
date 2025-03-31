@@ -5,9 +5,10 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import EmailStr
+import tempfile
 
 
-from app.models.Person import Person
+""" from app.models.Person import Person
 from app.models.Token import Token
 from app.models.FilteredEmployee import FilteredEmployee
 from app.models.PurchaseOrder import PurchaseOrder
@@ -16,10 +17,10 @@ from app.dal.employees_dal import EmployeesDAL
 from app.database.dependencies import get_employees_dal
 from app.routers.auth import create_access_token
 from app.routers.utils import format_path,save_files
-from app.routers.auth import get_current_user 
+from app.routers.auth import get_current_user  """
 
 
-""" from models.Person import Person
+from models.Person import Person
 from models.Token import Token
 from models.FilteredEmployee import FilteredEmployee
 from models.PurchaseOrder import PurchaseOrder
@@ -27,8 +28,8 @@ from models.AccessPermission import AccessPermission
 from dal.employees_dal import EmployeesDAL
 from database.dependencies import get_employees_dal
 from routers.auth import create_access_token
-from routers.utils import format_path,save_files
-from routers.auth import get_current_user """
+from routers.utils import format_path,save_and_rename_files,create_folder,upload_file_to_drive, download_file_drive,replace_file_in_folder,get_file
+from routers.auth import get_current_user
 
 from typing import Annotated, Any, Dict, Optional
 from datetime import datetime,timedelta
@@ -102,7 +103,7 @@ async def get_all_employees(employees_dal: EmployeesDAL = Depends(get_employees_
     return [employee async for employee in  employees_dal.get_all()]
 
 @router.get("/retrieve_files/{fiscal_code}/")
-async def retrieve_files(fiscal_code: str) -> FileResponse:
+async def retrieve_files(fiscal_code: str,employees_dal: EmployeesDAL = Depends(get_employees_dal)) -> FileResponse:
     """
     Retrieves the files of an employee.
 
@@ -114,17 +115,20 @@ async def retrieve_files(fiscal_code: str) -> FileResponse:
         FileResponse: The file response of the file.
 
     """
-    file_path = os.path.join(os.getenv("UPLOAD_DIR"),fiscal_code,"profile_image.png")
+    profile_image_id,_ = await employees_dal.get_file_id(fiscal_code, "profile_image")
 
-    formated_file_path = format_path(file_path)
+    file = await get_file(profile_image_id)
+
+    return Response(content=file, media_type="image/png", headers={
+        "Content-Disposition": "inline; filename=profile_image.png"
+    })
 
 
-    if not os.path.exists(formated_file_path):
-        raise HTTPException(status_code=400,detail="Path's doesn't exist")
-    return FileResponse(file_path)
+
+
 
 @router.get("/download/{fiscalCode}/{name}")
-async def download_file(fiscalCode: str, name: str) -> FileResponse:
+async def download_file(fiscalCode: str, name: str,employees_dal: EmployeesDAL = Depends(get_employees_dal)) -> FileResponse:
     """
     Downloads a file.
 
@@ -136,12 +140,27 @@ async def download_file(fiscalCode: str, name: str) -> FileResponse:
         FileResponse: The file response of the file.
     
     """
-    file_path = os.path.join(os.getenv("UPLOAD_DIR"), fiscalCode, name)
-    if not os.path.exists(file_path):  
-        raise HTTPException(status_code=404, detail="File not found")
+    file_id,_ = await employees_dal.get_file_id(fiscalCode, name)
+    if not file_id:
+        return {"error": "No se encontró el ID del archivo."}
+
+    # Crear archivo temporal en el servidor
+    with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{name}") as tmp_file:
+        file_path = tmp_file.name
+
+    # Descargar el archivo desde Google Drive
+    downloaded_file = await download_file_drive(real_file_id=file_id, file_path=file_path)
+    
+    if not downloaded_file or not os.path.exists(downloaded_file):
+        os.remove(file_path)
+        return {"error": "Error al descargar el archivo."}
+
+    # Retornar el archivo para descargar
     return FileResponse(
-        path=file_path,
-        filename=name
+        path=downloaded_file,
+        filename=name,
+        media_type="application/octet-stream",
+        headers={"Content-Disposition": f"attachment; filename={name}"}
     )
 
 """
@@ -176,7 +195,7 @@ async def login_for_access_token(response: Response,form_data: Annotated[OAuth2P
                                              "ut":user["user_credentials"]["user_type"],
                                              "fs":user["fiscal_code"]}, 
                                              expires_delta=access_token_expires)
-    print(user)
+    #print(user)
     return Token(access_token=access_token, token_type="bearer",
                  us=user["user_credentials"]["user_name"],
                  fs=user["fiscal_code"],
@@ -228,21 +247,27 @@ async def create_employee(
         visa (UploadFile): The visa of the employee.
         unilav (UploadFile): The unilav of the employee.
         employees_dal (EmployeesDAL): The employees DAL.
-zzz
+
     Returns:  
         dict: A dictionary containing a message indicating the success or failure of the operation.
     """
-    root = os.path.join(os.getenv("UPLOAD_DIR"),fiscal_code)
-    os.makedirs(root,exist_ok=True)
+
+    fiscal_code_dir_id = await create_folder(folder_name=fiscal_code, parent_folder_id=os.getenv("PARENT_FOLDER_ID"))
 
     files_to_save = [profile_image, id_card, unilav]
     file_names = ["profile_image", "id_card", "unilav"]
+
     if visa:
         files_to_save.append(visa)
         file_names.append("visa")
 
-        
-    saved_file_paths = await save_files(file_names=file_names, root_dir=root,files=files_to_save)
+    files_to_save = await save_and_rename_files(files_to_save, file_names)
+    #print(f"Files to save: {files_to_save}")
+
+    uploaded_file_ids = []
+    for file in files_to_save:
+        file_id = await upload_file_to_drive(file, folder_id=fiscal_code_dir_id)
+        uploaded_file_ids.append(file_id)
     
     #First Process images, save them and return the path
     employee = await employees_dal.create_employee(
@@ -260,10 +285,11 @@ zzz
             email = email,
             user_name= user_name,
             purchase_order= purchase_order,
-            profile_image_path= saved_file_paths[0],
-            id_card_path= saved_file_paths[1],
-            unilav_path= saved_file_paths[2],
-            visa_path= saved_file_paths[3] if len(saved_file_paths) > 3 else None
+            parent_folder_id = fiscal_code_dir_id,
+            profile_image_path= uploaded_file_ids[0],
+            id_card_path= uploaded_file_ids[1],
+            unilav_path= uploaded_file_ids[2],
+            visa_path= uploaded_file_ids[3] if len(uploaded_file_ids) > 3 else None
             ) 
                 
     return {"message" : f"Employee {first_name} {last_name} created successfully"}
@@ -432,7 +458,6 @@ async def update_employee(
         
         existing_employee = await employees_dal.list_employees(fiscal_code)
 
-       
         update_data: Dict[str, Any] = {
             "first_name": first_name,
             "last_name": last_name,
@@ -455,29 +480,34 @@ async def update_employee(
                 )
 
         if profile_image:
+
+            _,parent_folder_id = await employees_dal.get_file_id(fiscal_code, "profile_image")
+            
+            updated_file_id = await replace_file_in_folder(parent_folder_id, "profile_image.png", profile_image)
            
-            file_location = f"./uploads/{fiscal_code}/profile_image.png"
-            with open(file_location, "wb") as file:
-                file.write(await profile_image.read())
-            update_data["profile_image_path"] = file_location
+            update_data["profile_image_path"] = updated_file_id
         
         if id_card:
-            file_location = f"./uploads/{fiscal_code}/id_card.png"
-            with open(file_location, "wb") as file:
-                file.write(await id_card.read())
-            update_data["id_card_path"] = file_location
+
+            _,parent_folder_id = await employees_dal.get_file_id(fiscal_code, "id_card")
+            
+            updated_file_id = await replace_file_in_folder(parent_folder_id, "id_card.png", id_card)
+           
+            update_data["id_card_path"] = updated_file_id
 
         if visa:
-            file_location = f"./uploads/{fiscal_code}/visa.pdf"
-            with open(file_location, "wb") as file:
-                file.write(await visa.read())
-            update_data["visa_path"] = file_location
+            _,parent_folder_id = await employees_dal.get_file_id(fiscal_code, "visa")
+            
+            updated_file_id = await replace_file_in_folder(parent_folder_id, "visa.pdf", visa)
+           
+            update_data["visa_path"] = updated_file_id
         
         if unilav:
-            file_location = f"./uploads/{fiscal_code}/unilav.pdf"
-            with open(file_location, "wb") as file:
-                file.write(await unilav.read())
-            update_data["unilav_path"] = file_location
+            _,parent_folder_id = await employees_dal.get_file_id(fiscal_code, "unilav")
+            
+            updated_file_id = await replace_file_in_folder(parent_folder_id, "unilav.pdf", unilav)
+           
+            update_data["unilav_path"] = updated_file_id
 
        
         update_data = {key: value for key, value in update_data.items() if value is not None}

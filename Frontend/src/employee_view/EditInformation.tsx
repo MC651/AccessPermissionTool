@@ -12,11 +12,11 @@ import FileUploadField from "../register/FileInput";
 
 const EditInformation: React.FC = () => {
   const { loaded, employee } = useEmployee(); 
-
   const {openSnackbar,snackBarMessage,snackbarSeverity,showSnackbar,handleCloseSnackbar} = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdated, setIsUpdated] = useState(false);
-  
+  console.log(employee);
+  console.log(employee.visa_path);
   const {
     register,
     handleSubmit,
@@ -47,7 +47,7 @@ const EditInformation: React.FC = () => {
       unilav:null
     }
   });
-  
+  const hasPreviousVisa = !!employee?.visa_path;
   const contractStartDate = watch("contract_validity_start_date");
   const visaStartDate = watch("visa_start_date");
   const hasDirtyFields = Object.keys(dirtyFields).length > 0;
@@ -380,7 +380,7 @@ const EditInformation: React.FC = () => {
                   validate: (value:File) => {
                     const visaStartDate = watch("visa_start_date");
                     const visaEndDate = watch("visa_end_date");
-                    if ((visaStartDate || visaEndDate) && !value) {
+                    if ((visaStartDate || visaEndDate) && !value && !hasPreviousVisa) {
                       return "Visa is required when visa dates are provided.";
                     }
                     return true;

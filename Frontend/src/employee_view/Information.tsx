@@ -7,7 +7,7 @@ import Loading from "../components/Loading";
 const Information: React.FC = () => {
   const { loaded, employee } = useEmployee();
   const hasPurchaseOrders = employee?.purchase_order && employee?.purchase_order.length > 0;
-
+  
   return !loaded ? (
     employee ? (
       <Container maxWidth="lg">

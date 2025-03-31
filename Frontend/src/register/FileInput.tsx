@@ -17,7 +17,6 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
   watch,
   rules = {},
   fiscalCode,
-  fileExtension,
   errors = {} as FieldErrors<Employee>
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -26,7 +25,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
     <Box sx={{ display: "flex", alignItems: "center", marginTop: 2, gap: 2 }}>
       {isEdit && (
        <a
-       href={`${import.meta.env.VITE_API_URL}/download/${fiscalCode}/${name}.${fileExtension}`}
+       href={`${import.meta.env.VITE_API_URL}/download/${fiscalCode}/${name}`}
        download 
        >
        <Button

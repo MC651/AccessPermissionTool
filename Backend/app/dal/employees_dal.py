@@ -3,22 +3,23 @@ from datetime import datetime
 from pydantic import EmailStr
 from passlib.context import CryptContext
 from pymongo.errors import DuplicateKeyError
-import json
-from app.models.Person import Person
+import json 
+
+""" from app.models.Person import Person
 from app.models.Token import Token
 from app.models.FilteredEmployee import FilteredEmployee
 from app.models.ModifiedEmployee import ModifiedEmployee
 from app.models.PurchaseOrder import PurchaseOrder
 from app.models.AccessPermission import AccessPermission
-from app.models.Person import UserCredentials
+from app.models.Person import UserCredentials """
 
-""" from models.Person import Person
+from models.Person import Person
 from models.Token import Token
 from models.FilteredEmployee import FilteredEmployee
 from models.ModifiedEmployee import ModifiedEmployee
 from models.PurchaseOrder import PurchaseOrder
 from models.AccessPermission import AccessPermission
-from models.Person import UserCredentials """
+from models.Person import UserCredentials
 
 #Password Context for hashing algorithm bcrypt
 pwd_context = CryptContext(schemes=["bcrypt"],deprecated="auto")
@@ -33,7 +34,23 @@ class EmployeesDAL:
     """
     FIND methods
     """
+    
+    async def get_file_id(self,fiscal_code:str,name:str):
+
+        document = await self._db_collection.find_one({"fiscal_code": fiscal_code},
+                                                      projection = {"_id":1,
+                                                                    "parent_folder_id":1,
+                                                                    "profile_image_path":1,
+                                                                    "id_card_path":1,
+                                                                    "visa_path":1,
+                                                                    "unilav_path":1})
+        
+        return document[f"{name}_path"],document["parent_folder_id"]
+                                                                    
+
+
     async def list_employees(self, fiscal_code: str) -> Person:
+
         """
         Returns a Person instance from the database based on the fiscal code.
         Args:
@@ -42,12 +59,14 @@ class EmployeesDAL:
         Returns:
             Person: The Person instance.
         """
+
         document = await self._db_collection.find_one({"fiscal_code": fiscal_code})
         if not document:
             raise HTTPException(status_code=404, detail="Employee not found")
         return document
         
     async def get_all(self):
+
         """
         Retrieves all employees filtered from the database 
 
@@ -152,6 +171,7 @@ class EmployeesDAL:
                               email:EmailStr,
                               password:str,
                               purchase_order:list,
+                              parent_folder_id:str,
                               profile_image_path:str,
                               id_card_path:str,
                               visa_path:str,
@@ -184,6 +204,7 @@ class EmployeesDAL:
             dict: A dictionary containing a message indicating the success or failure of the operation.
 
         """
+
         try: 
             new = await self._db_collection.insert_one(
                 {"first_name":first_name,
@@ -200,24 +221,23 @@ class EmployeesDAL:
                     "email":email,
                     "password": await self.hash_password(password),
                     "user_type": user_type,
-                    "user_name": user_name
+                    "user_name": user_name 
                     },
+                "parent_folder_id":parent_folder_id,
                 "purchase_order":purchase_order,
                 "profile_image_path":profile_image_path,
                 "id_card_path":id_card_path,
                 "visa_path":visa_path,
                 "unilav_path":unilav_path
-        
                 }
             )
-            #print(new)
+            
             if not new:
                 raise HTTPException(status_code=400, detail="Error trying to insert employee")
             return new
     
         except DuplicateKeyError as e:
-            print(e)
-
+            #print(e)
             if "user_credentials.user_name" in e.details["errmsg"]:
                 raise HTTPException(status_code=400, detail=f"User name: {user_name } already in use")
             

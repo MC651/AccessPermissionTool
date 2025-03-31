@@ -23,8 +23,8 @@ class Person(BaseModel):
     visa_start_date: Optional[datetime] | None = Field(default=None)
     visa_end_date: Optional[datetime] | None = Field(default=None)
     user_credentials : UserCredentials
-    #purchase_order: Optional[list[PurchaseOrder]] = Field(default_factory=  lambda: [PurchaseOrder()])
     purchase_order: Optional[list[PurchaseOrder]]
+    parent_folder_id : Optional[str] = Field(default=None)
     profile_image_path: Optional[str] = None
     id_card_path: Optional[str] = None
     visa_path: Optional[str] = Field(default=None)
@@ -56,9 +56,9 @@ class Person(BaseModel):
             visa_end_date=doc["visa_end_date"],
             user_credentials=doc["user_credentials"],
             purchase_order=doc["purchase_order"],
+            parent_folder_id = doc["parent_folder_id"],
             profile_image_path=doc["profile_image_path"],
             id_card_path=doc["id_card_path"],
             visa_path=doc["visa_path"],
-            unilav_path=doc["unilav_path"]
-            
+            unilav_path=doc["unilav_path"]     
         )
