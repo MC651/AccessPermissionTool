@@ -28,7 +28,7 @@ export default function ToolBarImage() {
 
   return (
     <Stack direction="row" spacing={2}>
-      <Avatar src={imageUrl} alt="Profile Image" />
+      <Avatar src={imageUrl} alt="Profile Image" sx={{ width: 130,height:130 }}/>
     </Stack>
   );
 }

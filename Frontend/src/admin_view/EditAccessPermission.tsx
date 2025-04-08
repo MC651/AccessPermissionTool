@@ -1,4 +1,3 @@
- // @ts-nocheck
 import React, { useEffect, useState } from "react";
 import { EditTableProps, FastAPIError, Row } from "../types";
 import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, FormLabel, MenuItem, Select, TextField } from "@mui/material";
@@ -12,14 +11,14 @@ import MessageBar from "../components/MessageBar";
 
 
 const EditAccessPermission: React.FC<EditTableProps> = ({ open, handleCloseEditTable, row }) => {
-  console.log(row);
+  //console.log(row);
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdated, setIsUpdated] = useState(false);
   const {openSnackbar,snackBarMessage,snackbarSeverity,showSnackbar,handleCloseSnackbar} = useSnackbar();
 
-
   const { register, handleSubmit, reset, control, formState: { errors, dirtyFields }, } = useForm<Row>();
-  console.log(dirtyFields);
+  //console.log(dirtyFields);
+
   const onSubmit = async (data: Row) => {
     setIsLoading(true);
     if (Object.keys(dirtyFields).length === 0) {
@@ -27,18 +26,18 @@ const EditAccessPermission: React.FC<EditTableProps> = ({ open, handleCloseEditT
       setIsLoading(false);
       return;
     }
-    // Create an updated object by filtering dirty fields and assigning new values
+    
     const updatedFields: Partial<Row> = {};
 
-    // Loop over dirtyFields and add the modified fields to updatedFields
+    
     Object.keys(dirtyFields).forEach((key) => {
       if (key in data) {
         const field = key as keyof Row;
   
-        // Check if the field value is not undefined
+        
         const fieldValue = data[field];
         if (fieldValue !== undefined) {
-          updatedFields[field] = fieldValue;
+          (updatedFields[field] as unknown) = fieldValue;
         }
       }
     });

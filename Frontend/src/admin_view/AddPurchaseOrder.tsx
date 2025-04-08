@@ -35,7 +35,7 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
       }
     };
 
-    console.log(formattedData);
+    //console.log(formattedData);
     try {
       const response = await axios.patch(
         `${import.meta.env.VITE_API_URL}/create_purchase_order/`,
@@ -52,7 +52,7 @@ const AddPurchaseOrder: React.FC<DialogComponentProps> = ({ open, handleCloseAdd
       setisOrderCreated(true);
       
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error creating purchase order","error",true);
       setLoading(false);
       

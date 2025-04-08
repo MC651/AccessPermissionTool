@@ -2,10 +2,10 @@ import { createBrowserRouter, Navigate } from "react-router-dom"
 import Login from "../login/Login";
 import ErrorPage from "../error/ErrorPage";
 import {EmployeeProvider} from "../contexts/EmployeeContext";
-import EditInformation from "../employee_view/EditInformation";
 import Register from "../register/Register";
 import Autorized_Route from "../auth/Authorization";
-import UserInfo from "../employee_view/Information"
+//import UserInfo from "../employee_view/Information"
+import UserInfo2 from "../employee_view/Information2"
 import Unauthorized from "../unauthorized/Unauthorized"
 import AdminDashboard from "../admin_view/AdminDashboard";
 import DashboardWrapper from "../wrapper/DashBoardWrapper"
@@ -33,19 +33,7 @@ export const Router = createBrowserRouter([
             <Autorized_Route allowed_roles={['admin','user']}>
                 <DashboardWrapper>
                     <EmployeeProvider>
-                        <UserInfo/>
-                    </EmployeeProvider>
-                </DashboardWrapper>
-            </Autorized_Route>,
-        errorElement: <ErrorPage />
-    },
-    {
-        path: "/edit_info",
-        element:
-            <Autorized_Route allowed_roles={['admin','user']}>
-                <DashboardWrapper>
-                    <EmployeeProvider>
-                        <EditInformation />
+                        <UserInfo2/>
                     </EmployeeProvider>
                 </DashboardWrapper>
             </Autorized_Route>,

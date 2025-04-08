@@ -42,14 +42,14 @@ const AddAccessPermission: React.FC<AccessPermisionDialogComponentProps> = ({ op
                     }
                 }
             );
-            console.log(response);
+            //console.log(response);
             showSnackbar(response.data.message,"success",true);
             setIsLoading(false);
             setIsAccessPermissionCreated(true);
             
         } catch (error) {
             showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error creating access permission","error",true);
-            console.log("Error", error);
+            //console.log("Error", error);
         } finally {
             setTimeout (() => {
                 showSnackbar("","warning",false);
