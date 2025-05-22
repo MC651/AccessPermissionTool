@@ -1,4 +1,4 @@
- // @ts-nocheck
+// @ts-nocheck
 import React, { useEffect, useState,useRef } from "react";
 import { Row, EditPurchaseOrderProps, plantOptions, FastAPIError } from "../types";
 import {Box, Button, Checkbox, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, FormHelperText, FormLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
@@ -38,12 +38,12 @@ const EditPurchaseOrder: React.FC<EditPurchaseOrderProps> = ({ open, handleClose
       }
 
       const actualPO = transformData(row!);
-      console.log(actualPO);
+      //console.log(actualPO);
       const allData = {
         ...actualPO,
         access_permission: []
       }
-      console.log(allData);
+      //console.log(allData);
       try {
        const response = await axios.patch(
           `${import.meta.env.VITE_API_URL}/insert_purchase_order/${fiscal_code}`,
@@ -97,12 +97,15 @@ const EditPurchaseOrder: React.FC<EditPurchaseOrderProps> = ({ open, handleClose
     }
   });
 
-  // Remover campos vacíos del objeto resultante
+  
   const cleanData = (data: Row) => {
+    
     Object.keys(data).forEach(
-      (key) => data[key] === undefined || (typeof data[key] === 'object' && Object.keys(data[key]).length === 0)
-        && delete data[key]
+      (key) => {  
+        const field = data[key] as unknown;
+        if(field === undefined || (typeof field === 'object' && Object.keys(field).length === 0)) {delete data[key]}}
     );
+    //console.log(data);
     return data;
   };
 
@@ -117,16 +120,16 @@ const EditPurchaseOrder: React.FC<EditPurchaseOrderProps> = ({ open, handleClose
 
         const updatedFields = Object.keys(dirtyFields).reduce((acc, key) => {
             const field = key as keyof Row;
-            acc[field] = data[field];
+            (acc[field] as unknown)  = data[field];
             return acc;
         }, {} as Partial<Row>);
 
 
         const transformedData = cleanData(transformData(updatedFields));
-        console.log(transformedData);
+        //console.log(transformedData);
 
         try {
-            console.log(updatedFields);
+            //console.log(updatedFields);
             const response = await axios.patch(
               `${import.meta.env.VITE_API_URL}/update_purchase_order/${row?.po_number}`,
               transformedData,
@@ -136,7 +139,7 @@ const EditPurchaseOrder: React.FC<EditPurchaseOrderProps> = ({ open, handleClose
                 }
               }
             ); 
-            console.log(response);
+            //console.log(response);
             showSnackbar(response.data.message,"success",true);
             setIsLoading(false);
             setIsUpdated(true);

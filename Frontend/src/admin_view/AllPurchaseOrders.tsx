@@ -16,6 +16,7 @@ import { AccesPermission } from '../types';
 
 
 const PurchaseOrders: React.FC<AllFilteredEmployees> = ({ all_employees }: AllFilteredEmployees) => {
+  //console.log(all_employees);
 
   const fiscal_codes: string[] = all_employees?.map(employee => employee.fiscal_code) || [];
 
@@ -60,7 +61,7 @@ const flatEmployees = all_employees?.flatMap(employee =>
   ) || []
 )?.map((item, index) => ({ ...item, id: index })) || [];
 
-console.log(flatEmployees);
+//console.log(flatEmployees);
 
   const [openPurchaseOrder, setOpenPurchaseOrder] = useState(false);
   const [openAccessPermission, setOpenAccessPermission] = useState(false);

@@ -20,7 +20,7 @@ const PurchaseOrders: React.FC<PurchaseOrdersArray> = ({ purchase_orders }: Purc
 
 
   return (
-    <div style={{ height: 400, width: '100%' }}>
+    <div style={{ height: 500, width: '100%',marginTop:10 }}>
       <DataGrid
         rows={FlatPurchaseOrder}
         columns={Columns}

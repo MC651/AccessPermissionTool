@@ -1,22 +1,27 @@
- // @ts-nocheck
-import React, { useState } from "react";
+ import React, { useState } from "react";
 import { useEmployee } from "../contexts/EmployeeContext";
 import { useForm } from "react-hook-form";
-import { Employee, FastAPIError } from "../types";
+import { Employee, FastAPIError,EditEmployeeProps } from "../types";
 import axios from "axios";
-import { TextField, Button, Box, Typography, MenuItem, Container, Divider, FormControl, FormLabel, CircularProgress, Select } from "@mui/material";
+import { TextField, Button, Box, Typography, MenuItem, Container, Divider, FormControl, FormLabel, CircularProgress, Select,Dialog,DialogContent, DialogActions } from "@mui/material";
 import Loading from "../components/Loading";
 import { useSnackbar } from "../hooks/useSnackbar";
 import MessageBar from "../components/MessageBar";
 import FileUploadField from "../register/FileInput";
 
-const EditInformation: React.FC = () => {
-  const { loaded, employee } = useEmployee(); 
-
-  const {openSnackbar,snackBarMessage,snackbarSeverity,showSnackbar,handleCloseSnackbar} = useSnackbar();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isUpdated, setIsUpdated] = useState(false);
+const EditInformation: React.FC<EditEmployeeProps> = ({ open, handleCloseEditTable }) => {
   
+  const { loaded, employee } = useEmployee(); 
+  const {openSnackbar,snackBarMessage,snackbarSeverity,showSnackbar,handleCloseSnackbar} = useSnackbar();
+  const [setLoading, setIsLoading] = useState(false);
+  const [isUpdated, setIsUpdated] = useState(false);
+
+  const handleClose = () => {
+    setIsLoading(false);
+    setIsUpdated(false);
+    handleCloseEditTable();
+  };
+
   const {
     register,
     handleSubmit,
@@ -47,7 +52,8 @@ const EditInformation: React.FC = () => {
       unilav:null
     }
   });
-  
+
+  const hasPreviousVisa = !!employee?.visa_path;
   const contractStartDate = watch("contract_validity_start_date");
   const visaStartDate = watch("visa_start_date");
   const hasDirtyFields = Object.keys(dirtyFields).length > 0;
@@ -57,17 +63,17 @@ const EditInformation: React.FC = () => {
   const hasNewUnilav  = !!watch("unilav");
   const isButtonDisabled = !(hasDirtyFields || hasNewProfileImage || hasNewIdCard || hasNewVisa || hasNewUnilav);
 
-  console.log(dirtyFields);
+  //console.log(dirtyFields);
   
 
   const onSubmit = handleSubmit(async (data: Employee) => {
   setIsLoading(true);
-  console.log(data);
-
+  //console.log(data);
+  
   const updatedFields = Object.keys(dirtyFields).reduce((acc, key) => {
     const field = key as keyof Employee;
     if (dirtyFields[field]) {
-      acc[field] = data[field];
+      (acc[field] as unknown) = data[field];
     }
     return acc;
   }, {} as Partial<Employee>);
@@ -126,12 +132,12 @@ const EditInformation: React.FC = () => {
       showSnackbar(response.data.message,"success",true);
       setIsLoading(false);
       setIsUpdated(true);
-      console.log(response)
+      //console.log(response)
       //reset();
     } catch (error) {
       showSnackbar((error as FastAPIError)?.response?.data?.detail || "Error updating data","error",true);
       setIsLoading(false);
-      console.log(error)
+      //console.log(error)
       //console.log(error)
     } finally {
       setTimeout(() => {
@@ -144,14 +150,15 @@ const EditInformation: React.FC = () => {
 
   return !loaded ? (
     employee ? (
+      <Dialog open={open} onClose={handleCloseEditTable} maxWidth="lg" fullWidth>
       <Container maxWidth="lg">
-
-        <Box sx={{ maxWidth: 800, margin: "auto", marginTop: 3, marginBottom: 3 }}>
+        <Box sx={{ paddingmargin: "auto", marginTop: 3, marginBottom: 3,padding:6 }}>
           <Typography variant="h4" gutterBottom textAlign={"center"}>
             Edit Information
           </Typography>
           <Divider sx={{ marginTop: 2, marginBottom: 2 }} />
           <form onSubmit={onSubmit}>
+            <DialogContent>
             <Box sx={{ display: 'flex', gap: 2 }}>
               <FormControl fullWidth margin="normal">
                 <FormLabel>First Name:</FormLabel>
@@ -349,7 +356,6 @@ const EditInformation: React.FC = () => {
                 watch={watch}
                 isEdit={true}
                 fiscalCode={employee?.fiscal_code} 
-                fileExtension="png"
               />
 
                <FileUploadField
@@ -361,7 +367,6 @@ const EditInformation: React.FC = () => {
                 watch={watch}
                 isEdit={true}
                 fiscalCode={employee?.fiscal_code} 
-                fileExtension="png"
               />
 
                
@@ -374,13 +379,12 @@ const EditInformation: React.FC = () => {
                 watch={watch}
                 isEdit={true}
                 fiscalCode={employee?.fiscal_code} 
-                fileExtension="pdf"
                 errors={errors}
                 rules={{
                   validate: (value:File) => {
                     const visaStartDate = watch("visa_start_date");
                     const visaEndDate = watch("visa_end_date");
-                    if ((visaStartDate || visaEndDate) && !value) {
+                    if ((visaStartDate || visaEndDate) && !value && !hasPreviousVisa) {
                       return "Visa is required when visa dates are provided.";
                     }
                     return true;
@@ -396,20 +400,36 @@ const EditInformation: React.FC = () => {
                 setValue={setValue}
                 watch={watch}
                 isEdit={true}
-                fiscalCode={employee?.fiscal_code} 
-                fileExtension="pdf"
+                fiscalCode={employee?.fiscal_code}
               /> 
-              
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
-              {!isLoading && !isUpdated && (
-                <Button type="submit" variant="contained" color="primary" sx={{ display: 'inline', marginTop: 2, marginBottom: 2 }} disabled={isButtonDisabled} >
-                  Update
-                </Button>
-              )}
-              {isLoading && (
-                <CircularProgress />
-              )}
-            </Box>
+               </DialogContent>
+
+               <DialogActions sx={{ justifyContent: 'center' }}>
+  <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 2,
+    }}
+  >
+    {!setLoading && !isUpdated && (
+      <Button
+        type="submit"
+        variant="contained"
+        color="primary"
+        sx={{ marginTop: 2, marginBottom: 2 }}
+        disabled={isButtonDisabled}
+      >
+        Update
+      </Button>
+    )}
+    {setLoading && <CircularProgress />}
+    <Button onClick={handleClose} color="primary" variant="contained">
+      Cancel
+    </Button>
+  </Box>
+</DialogActions>
           </form>
         </Box>
         <MessageBar
@@ -422,6 +442,7 @@ const EditInformation: React.FC = () => {
               horizontal="center"
           />      
       </Container>
+      </Dialog>
     ) : (
       <Loading message="Loading your data, please wait..." />
     )

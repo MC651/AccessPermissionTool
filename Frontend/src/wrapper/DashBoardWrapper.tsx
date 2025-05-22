@@ -6,7 +6,6 @@ import { AppProvider,type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from './useDemoRouter';
 import { DashboardWrapperProps } from '../types';
-import ToolBarImage from './ToolBarImage';
 
 const userType = localStorage.getItem("user_type")
 
@@ -19,11 +18,6 @@ const NAVIGATION: Navigation = [
         segment: 'home',
         title: 'Home',
         icon: <DashboardIcon />,
-    },
-    {
-        segment: 'edit_info',
-        title: 'Edit Info',
-        icon: <TimelineIcon />,
     },
     ...(userType === 'admin'
         ? [
@@ -68,17 +62,17 @@ function DashboardWrapper({ children }: DashboardWrapperProps) {
     return (
         <AppProvider 
         navigation={NAVIGATION} 
-        
         router={router} 
         theme={demoTheme} 
         branding={{
             logo: <img src="images\logo_corporate.png" alt="logo" />,
-            title: '',
-        }}
-        >
-            <DashboardLayout slots={{toolbarActions:ToolBarImage}} >
-                {children}
-            </DashboardLayout>
+            title: ''
+        }}>
+
+        <DashboardLayout>   
+            {children}
+        </DashboardLayout>
+
         </AppProvider>
     );
 }

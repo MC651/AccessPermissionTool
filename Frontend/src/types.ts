@@ -6,7 +6,14 @@ import { Breakpoint } from '@mui/material';
 export interface LoginFormInputss {
     username: string;
     password: string;
+
+  }
+
+export interface EditEmployeeProps {
+  open: boolean;
+  handleCloseEditTable: () => void;
 }
+
 export interface Employee {
     first_name: string;
     last_name: string;
@@ -109,9 +116,7 @@ export interface LoginFormInputs {
     password: string;
 }
 
-export interface DashboardWrapperProps {
-    children: React.ReactNode; 
-}
+
 
 export interface AppProviderRouter {
   pathname: string;
