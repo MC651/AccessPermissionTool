@@ -23,7 +23,7 @@ UPLOAD_DIR = ""
 ```
 
 Frontend .env
-```
+```.env
 VITE_API_URL = ""
 ```
 The application is hosted on [render.com](https://accesspermissiontool-frontend.onrender.com/login)
